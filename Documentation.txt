@@ -46,6 +46,7 @@
 			rotation: Vector (0, 0, 0)
 			scale: Vector (1, 1, 1) // Множитель размера
 			mesh: Array (Mesh.cube) // Полигональная фигура
+			center: Vector (0, 0, 0) // Точка опоры объекта
 		}
 	}
 	Camera {

@@ -88,8 +88,10 @@ class Mesh {
 		let vertices = [];
 
 		let mesh = [];
-		let min = new Vector();
+
 		let max = new Vector();
+		let min = new Vector();
+
 		for (let i = 0; i < data.length; i++) {
 			while (/.+\s+$/.test(data[i]))
 				data[i] = data[i].slice(0, -1);
@@ -103,20 +105,60 @@ class Mesh {
 			}
 			else if (line[0] == "f") {
 				if (line.length == 4) {
-					mesh.push([vertices[Number(line[1].split('/')[0]) - 1], 
-							   vertices[Number(line[2].split('/')[0]) - 1], 
-							   vertices[Number(line[3].split('/')[0]) - 1]]);
+					mesh.push([vertices[Number(line[1].split('/')[0]) - 1].copy, 
+							   vertices[Number(line[2].split('/')[0]) - 1].copy, 
+							   vertices[Number(line[3].split('/')[0]) - 1].copy]);
+					for (let i = 1; i < 4; i++) {
+						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
+							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
+						if (vertices[Number(line[i].split('/')[0]) - 1].y > max.y)
+							max.y = vertices[Number(line[i].split('/')[0]) - 1].y;
+						if (vertices[Number(line[i].split('/')[0]) - 1].z > max.z)
+							max.z = vertices[Number(line[i].split('/')[0]) - 1].z;
+
+						if (vertices[Number(line[i].split('/')[0]) - 1].x < min.x)
+							min.x = vertices[Number(line[i].split('/')[0]) - 1].x;
+						if (vertices[Number(line[i].split('/')[0]) - 1].y < min.y)
+							min.y = vertices[Number(line[i].split('/')[0]) - 1].y;
+						if (vertices[Number(line[i].split('/')[0]) - 1].z < min.z)
+							min.z = vertices[Number(line[i].split('/')[0]) - 1].z;
+					}
+
 				} else if (line.length == 5) {
-					mesh.push([vertices[Number(line[1].split('/')[0]) - 1], 
-							   vertices[Number(line[2].split('/')[0]) - 1], 
-							   vertices[Number(line[3].split('/')[0]) - 1]]);
-					mesh.push([vertices[Number(line[2].split('/')[0]) - 1], 
-							   vertices[Number(line[3].split('/')[0]) - 1], 
-							   vertices[Number(line[4].split('/')[0]) - 1]]);
+					mesh.push([vertices[Number(line[1].split('/')[0]) - 1].copy, 
+							   vertices[Number(line[2].split('/')[0]) - 1].copy, 
+							   vertices[Number(line[3].split('/')[0]) - 1].copy]);
+					mesh.push([vertices[Number(line[2].split('/')[0]) - 1].copy, 
+							   vertices[Number(line[3].split('/')[0]) - 1].copy, 
+							   vertices[Number(line[4].split('/')[0]) - 1].copy]);
+					for (let i = 1; i < 5; i++) {
+						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
+							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
+						if (vertices[Number(line[i].split('/')[0]) - 1].y > max.y)
+							max.y = vertices[Number(line[i].split('/')[0]) - 1].y;
+						if (vertices[Number(line[i].split('/')[0]) - 1].z > max.z)
+							max.z = vertices[Number(line[i].split('/')[0]) - 1].z;
+
+						if (vertices[Number(line[i].split('/')[0]) - 1].x < min.x)
+							min.x = vertices[Number(line[i].split('/')[0]) - 1].x;
+						if (vertices[Number(line[i].split('/')[0]) - 1].y < min.y)
+							min.y = vertices[Number(line[i].split('/')[0]) - 1].y;
+						if (vertices[Number(line[i].split('/')[0]) - 1].z < min.z)
+							min.z = vertices[Number(line[i].split('/')[0]) - 1].z;
+					}
 				} else {
 					alert("Invalid .obj file: vertices loading failed");
 					return undefined;
 				}
+			}
+		}
+
+		let move = Vector.substract(new Vector(), new Vector((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + min.z) / 2));
+		let scale = 1 / Math.max(max.x - min.x, Math.max(max.y - min.y, max.z - min.z));
+		for (let i = 0; i < mesh.length; i++) {
+			for (let j = 0; j < 3; j++) {
+				mesh[i][j].move(move);
+				mesh[i][j].multiply(scale);
 			}
 		}
 		return new Mesh(mesh, []);
@@ -151,41 +193,9 @@ class Object3D {
 		this.position = new Vector();
 		this.rotation = new Vector();
 		this.scale = new Vector(1, 1, 1);
-		this._mesh = Mesh.cube;	
 		this.center = new Vector();
-		this.recalculateCenter()
+		this.mesh = Mesh.cube;	
 		objects.push(this);
-	}
-
-	recalculateCenter() {
-		let max = this._mesh.polygons[0][0].copy;
-		let min = this._mesh.polygons[0][0].copy;
-		for (let i = 0; i < this._mesh.polygons.length; i++) {
-			for (let j = 0; j < this._mesh.polygons[i].length; j++) {
-				if (this._mesh.polygons[i][j].x > max.x)
-					max.x = this._mesh.polygons[i][j].x;
-				if (this._mesh.polygons[i][j].y > max.y)
-					max.y = this._mesh.polygons[i][j].y;
-				if (this._mesh.polygons[i][j].z > max.z)
-					max.z = this._mesh.polygons[i][j].z;
-
-				if (this._mesh.polygons[i][j].x < min.x)
-					min.x = this._mesh.polygons[i][j].x;
-				if (this._mesh.polygons[i][j].y < min.y)
-					min.y = this._mesh.polygons[i][j].y;
-				if (this._mesh.polygons[i][j].z < min.z)
-					min.z = this._mesh.polygons[i][j].z;
-			}
-		}
-		this.center = new Vector((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + min.z) / 2);
-	}
-	
-	set mesh(value) {
-		this._mesh = value;
-		this.recalculateCenter();
-	}
-	get mesh() {
-		return this._mesh;
 	}
 }
 
