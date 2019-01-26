@@ -1,6 +1,10 @@
+let render_time = (new Date).getTime();
 function render(camera) {
 	screenSize = (new Vector(canvas.width, canvas.height)).length;
 	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.fillText(Math.floor(1000 / ((new Date).getTime() - render_time)) + " FPS", 1, 10);
+	render_time = (new Date).getTime();
+
 	let horizontal = new Vector(1, 0, 0);
 	let vertical = new Vector(0, 1, 0);
 	let forward = new Vector(0, 0, 1);
@@ -106,10 +110,10 @@ function triangle(p1, p2, p3) {
 		let k2 = (p2.y - p3.y) / (p2.x - p3.x);
 		m1 = p1.y - k1 * p1.x;
 		m2 = p2.y - k2 * p2.x ;
-		for (let x = 0; x < getWindowSize().width; x++) {
+		for (let x = 0; x < canvas.width; x++) {
 			let y1 = x * k1 + m1;
 			let y2 = x * k2 + m2;
-			for (let y = 0; y < getWindowSize().height; y++) {
+			for (let y = 0; y < canvas.height; y++) {
 				if (k1 > 0 && k2 < 0) {
 					if (y < y1 && y < y2) {
 						if (y > p1.y && y > p3.y)

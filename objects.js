@@ -125,8 +125,24 @@ class Mesh {
 	static get cube() {
 		return Mesh.loadObject("obj/cube.obj");
 	}
+	static get sphere() {
+		return Mesh.loadObject("obj/sphere.obj");
+	}
+	static get cylinder() {
+		return Mesh.loadObject("obj/cylinder.obj");
+	}
+	static get pyramid() {
+		return Mesh.loadObject("obj/pyramid.obj");
+	}
+
 	static get cat() {
 		return Mesh.loadObject("obj/cat.obj");
+	}
+	static get cat_lpoly() {
+		return Mesh.loadObject("obj/cat_lpoly.obj");
+	}
+	static get deer() {
+		return Mesh.loadObject("obj/deer.obj");
 	}
 }
 
