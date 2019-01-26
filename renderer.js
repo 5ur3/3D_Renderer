@@ -61,43 +61,52 @@ function render(camera) {
 		for (let poly = 0; poly < polygons.length; poly++) {
 			let points = [];
 			let inView = 0;
-			for (let i = 0; i < 3; i++) {
-				polygons[poly][i] = Vector.substract(polygons[poly][i], objects[object].center);
-				polygons[poly][i] = rotate(polygons[poly][i], x, objects[object].rotation.x);
-				polygons[poly][i] = rotate(polygons[poly][i], y, objects[object].rotation.y);
-				polygons[poly][i] = rotate(polygons[poly][i], z, objects[object].rotation.z);
-
-				let vertex = new Vector(polygons[poly][i].x * objects[object].scale.x + objects[object].position.x, 
-										polygons[poly][i].y * objects[object].scale.y + objects[object].position.y, 
-										polygons[poly][i].z * objects[object].scale.z + objects[object].position.z); // vertex pos in space
-				let vertex2cam = new Vector(vertex.x - camera.position.x, vertex.y - camera.position.y, vertex.z - camera.position.z); // vertex pos in camera space
-				let angle = Vector.angle(vertex2cam, forward); // angle btw camera's view vector and vector from camera to vertex pos
-				let cam2plane = new Vector(forward.x * Math.cos(angle) * vertex2cam.length, 
-										   forward.y * Math.cos(angle) * vertex2cam.length, 
-										   forward.z * Math.cos(angle) * vertex2cam.length); // vector from camera to plane's origin
-				let vertex2plane = new Vector(vertex2cam.x - cam2plane.x, 
-											  vertex2cam.y - cam2plane.y,
-											  vertex2cam.z - cam2plane.z); // vector from plane's origin to vertex
-				let horizontal_angle = Vector.angle(horizontal, vertex2plane);
-				let vertical_angle = Vector.angle(vertical, vertex2plane);
-				let plane_angle = horizontal_angle;
-				if (vertical_angle > Math.PI / 2)
-					plane_angle += 2 * (Math.PI - plane_angle);
-				let plane_vector = (new Vector(Math.cos(plane_angle), -Math.sin(plane_angle))).normalized;
-				if (angle <= (camera.viewAngle * Math.PI / 180) / 2) 
-					inView = 1;
-				x = plane_vector.x * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
-				y = plane_vector.y * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
-				points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
-			}
-			if (inView) {
-				context.beginPath();
-				context.moveTo(points[0].x, points[0].y);
-				context.lineTo(points[1].x, points[1].y);
-				context.lineTo(points[2].x, points[2].y);
-				context.lineTo(points[0].x, points[0].y);
-				context.stroke(); 
-				context.closePath();
+			draw_poly: {
+				for (let i = 0; i < 3; i++) {
+					polygons[poly][i] = Vector.substract(polygons[poly][i], objects[object].center);
+					polygons[poly][i] = rotate(polygons[poly][i], x, objects[object].rotation.x);
+					polygons[poly][i] = rotate(polygons[poly][i], y, objects[object].rotation.y);
+					polygons[poly][i] = rotate(polygons[poly][i], z, objects[object].rotation.z);
+					let vertex = new Vector(polygons[poly][i].x * objects[object].scale.x + objects[object].position.x, 
+											polygons[poly][i].y * objects[object].scale.y + objects[object].position.y, 
+											polygons[poly][i].z * objects[object].scale.z + objects[object].position.z); // vertex pos in space
+					if (objects[object].mesh.normals.length > 0) {
+						let normal = objects[object].mesh.normals[poly].copy;
+						normal = rotate(normal, x, objects[object].rotation.x);
+						normal = rotate(normal, y, objects[object].rotation.y);
+						normal = rotate(normal, z, objects[object].rotation.z);
+						if (Vector.angle(normal, Vector.substract(vertex, camera.position)) < Math.PI / 2)
+							break draw_poly;
+					}
+					let vertex2cam = new Vector(vertex.x - camera.position.x, vertex.y - camera.position.y, vertex.z - camera.position.z); // vertex pos in camera space
+					let angle = Vector.angle(vertex2cam, forward); // angle btw camera's view vector and vector from camera to vertex pos
+					let cam2plane = new Vector(forward.x * Math.cos(angle) * vertex2cam.length, 
+											   forward.y * Math.cos(angle) * vertex2cam.length, 
+											   forward.z * Math.cos(angle) * vertex2cam.length); // vector from camera to plane's origin
+					let vertex2plane = new Vector(vertex2cam.x - cam2plane.x, 
+												  vertex2cam.y - cam2plane.y,
+												  vertex2cam.z - cam2plane.z); // vector from plane's origin to vertex
+					let horizontal_angle = Vector.angle(horizontal, vertex2plane);
+					let vertical_angle = Vector.angle(vertical, vertex2plane);
+					let plane_angle = horizontal_angle;
+					if (vertical_angle > Math.PI / 2)
+						plane_angle += 2 * (Math.PI - plane_angle);
+					let plane_vector = (new Vector(Math.cos(plane_angle), -Math.sin(plane_angle))).normalized;
+					if (angle <= (camera.viewAngle * Math.PI / 180) / 2) 
+						inView = 1;
+					x = plane_vector.x * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
+					y = plane_vector.y * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
+					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
+				}
+				if (inView) {
+					context.beginPath();
+					context.moveTo(points[0].x, points[0].y);
+					context.lineTo(points[1].x, points[1].y);
+					context.lineTo(points[2].x, points[2].y);
+					context.lineTo(points[0].x, points[0].y);
+					context.stroke(); 
+					context.closePath();
+				}
 			}
 		}
 	}

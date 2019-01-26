@@ -83,8 +83,10 @@ class Mesh {
 		let data = file.split("\n");
 
 		let vertices = [];
+		let norms = [];
 
 		let mesh = [];
+		let normals = [];
 
 		let max = new Vector();
 		let min = new Vector();
@@ -100,11 +102,20 @@ class Mesh {
 				}
 				vertices.push(new Vector(Number(line[1]), Number(line[2]), Number(line[3])));
 			}
+			else if (line[0] == "vn") {
+				if (line.length != 4) {
+					alert("Invalid .obj file: normals loading failed");
+					return undefined;
+				}
+				norms.push(new Vector(Number(line[1]), Number(line[2]), Number(line[3])));
+			}
 			else if (line[0] == "f") {
 				if (line.length == 4) {
 					mesh.push([vertices[Number(line[1].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[2].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[3].split('/')[0]) - 1].copy]);
+					if (norms.length)
+						normals.push(norms[Number(line[1].split('/')[2]) - 1].copy);
 					for (let i = 1; i < 4; i++) {
 						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
 							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
@@ -128,6 +139,8 @@ class Mesh {
 					mesh.push([vertices[Number(line[2].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[3].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[4].split('/')[0]) - 1].copy]);
+					if (norms.length) 
+						normals.push(norms[Number(line[1].split('/')[2]) - 1].copy);
 					for (let i = 1; i < 5; i++) {
 						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
 							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
@@ -158,7 +171,7 @@ class Mesh {
 				mesh[i][j].multiply(scale);
 			}
 		}
-		return new Mesh(mesh, []);
+		return new Mesh(mesh, normals);
 	}
 
 	static get cube() {
