@@ -49,9 +49,6 @@ class Vector {
 	angle(vector2) {
 		return Vector.angle(this, vector2);
 	}
-	cross(vector2) {
-		return Vector.cross(this, vector2);
-	}
 	multiply(factor) {
 		this.x *= factor;
 		this.y *= factor;
