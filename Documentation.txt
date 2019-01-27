@@ -24,6 +24,7 @@
 			Vector.add(vector1: Vector, vector2: Vector) : Vector // Возвращает vector1 + vector2
 			Vector.substract(vector1: Vector, vector2: Vector) : Vector // Возвращает vector1 - vector2
 			Vector.multiply(vector: Vector, factor: Number) : Vector // Возвращает вектор, полученный в результате перемножения каждого компонента вектора на число
+			Vector.cross(Vector, Vector) : Vector // Возвращает вектор, перпендикулярный сразу к двум векторам
 		}
 	}
 	Mesh {
