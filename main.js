@@ -1,11 +1,11 @@
 let camera = new Camera();
-let cat = new Object3D();
-cat.scale.multiply(3);
-cat.mesh = Mesh.cat_lpoly;
 let stage = new Object3D();
 stage.mesh = Mesh.cylinder;
 stage.scale = new Vector(3, 0.1, 3);
 stage.position.y = -1.55;
+let cat = new Object3D();
+cat.scale.multiply(3);
+cat.mesh = Mesh.cat_lpoly;
 
 let speed = .5;
 let amp = 7;

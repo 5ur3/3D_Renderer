@@ -2,6 +2,7 @@ let render_time = (new Date).getTime();
 function render(camera) {
 	screenSize = (new Vector(canvas.width, canvas.height)).length;
 	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = "#000000";
 	context.fillText(Math.floor(1000 / ((new Date).getTime() - render_time)) + " FPS", 1, 10);
 	render_time = (new Date).getTime();
 
@@ -40,7 +41,56 @@ function render(camera) {
 							  vector.z);
 		}
 	}
-	
+
+	let canvasData = context.getImageData(0, 0, canvas.width, canvas.height);
+	function triangle(point1, point2, point3, r, g, b) {
+		let p1 = new Vector(Math.floor(point1.x), Math.floor(point1.y));
+		let p2 = new Vector(Math.floor(point2.x), Math.floor(point2.y));
+		let p3 = new Vector(Math.floor(point3.x), Math.floor(point3.y));
+
+		if (p1.x == p2.x && p2.x == p3.x || 
+			p1.y == p2.y && p2.y == p3.y ||
+			p1.x == p2.x && p1.y == p2.y ||
+			p2.x == p3.x && p2.y == p3.y ||
+			p3.x == p1.x && p3.y == p1.y)
+			return;
+
+		let k1 = (p1.y - p2.y) / (p1.x - p2.x);
+		let k2 = (p2.y - p3.y) / (p2.x - p3.x);
+		let k3 = (p3.y - p1.y) / (p3.x - p1.x);
+		let m1 = p1.y - k1 * p1.x;
+		let m2 = p2.y - k2 * p2.x;
+		let m3 = p3.y - k3 * p3.x;
+
+		if (k1 == k2 || 
+			k2 == k3 ||
+			k3 == k1)
+			return;
+
+		let min = new Vector(Math.min(Math.min(p1.x, p2.x), p3.x), Math.min(Math.min(p1.y, p2.y), p3.y));
+		let max = new Vector(Math.max(Math.max(p1.x, p2.x), p3.x), Math.max(Math.max(p1.y, p2.y), p3.y));
+		let midpoint = new Vector((p1.x + p2.x + p3.x) / 3, (p1.y + p2.y + p3.y) / 3);
+		
+		function point(x, y) {
+			let index = (x + y * canvas.width) * 4;
+			canvasData.data[index + 0] = r;
+		    canvasData.data[index + 1] = g;
+		    canvasData.data[index + 2] = b;
+			canvasData.data[index + 3] = 255;
+		}
+		for (let x = min.x; x < max.x; x++) {
+			for (let y = min.y; y < max.y; y++) {
+				if ((((k1 == Infinity || k1 == -Infinity) && ((midpoint.x < p1.x && x < p1.x) || (midpoint.x >= p1.x && x >= p1.x))) || 
+					 (k1 != Infinity && (((midpoint.y < k1 * midpoint.x + m1) && y < k1 * x + m1) || ((midpoint.y >= k1 * midpoint.x + m1)) && y >= k1 * x + m1))) &&
+					(((k2 == Infinity || k2 == -Infinity) && ((midpoint.x < p2.x && x < p2.x) || (midpoint.x >= p2.x && x >= p2.x))) || 
+					 (k2 != Infinity && (((midpoint.y < k2 * midpoint.x + m2) && y < k2 * x + m2) || ((midpoint.y >= k2 * midpoint.x + m2)) && y >= k2 * x + m2))) &&
+					(((k3 == Infinity || k3 == -Infinity) && ((midpoint.x < p3.x && x < p3.x) || (midpoint.x >= p3.x && x >= p3.x))) || 
+					 (k3 != Infinity && (((midpoint.y < k3 * midpoint.x + m3) && y < k3 * x + m3) || ((midpoint.y >= k3 * midpoint.x + m3)) && y >= k3 * x + m3))))
+					point(x, y);
+			}
+		}
+	}
+
 	vertical = rotate(vertical, x, camera.rotation.x);
 	vertical = rotate(vertical, y, camera.rotation.y);
 	vertical = rotate(vertical, z, camera.rotation.z);
@@ -84,7 +134,7 @@ function render(camera) {
 											   forward.y * Math.cos(angle) * vertex2cam.length, 
 											   forward.z * Math.cos(angle) * vertex2cam.length); // vector from camera to plane's origin
 					let vertex2plane = new Vector(vertex2cam.x - cam2plane.x, 
-												  vertex2cam.y - cam2plane.y,
+												  vertex2cam.y - cam2plane.y, 	
 												  vertex2cam.z - cam2plane.z); // vector from plane's origin to vertex
 					let horizontal_angle = Vector.angle(horizontal, vertex2plane);
 					let vertical_angle = Vector.angle(vertical, vertex2plane);
@@ -98,58 +148,10 @@ function render(camera) {
 					y = plane_vector.y * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
 				}
-				if (inView) {
-					context.beginPath();
-					context.moveTo(points[0].x, points[0].y);
-					context.lineTo(points[1].x, points[1].y);
-					context.lineTo(points[2].x, points[2].y);
-					context.lineTo(points[0].x, points[0].y);
-					context.stroke(); 
-					context.closePath();
-				}
+				if (inView)
+					triangle(points[0], points[1], points[2], object * (256 / objects.length) % 255, poly * (256 / polygons.length) % 255, 127);
 			}
 		}
 	}
-
-}
-function triangle(p1, p2, p3) {
-	function triangle_top() {
-		context.strokeStyle = "#000000";
-		let k1 = (p1.y - p2.y) / (p1.x - p2.x);
-		let k2 = (p2.y - p3.y) / (p2.x - p3.x);
-		m1 = p1.y - k1 * p1.x;
-		m2 = p2.y - k2 * p2.x ;
-		for (let x = 0; x < canvas.width; x++) {
-			let y1 = x * k1 + m1;
-			let y2 = x * k2 + m2;
-			for (let y = 0; y < canvas.height; y++) {
-				if (k1 > 0 && k2 < 0) {
-					if (y < y1 && y < y2) {
-						if (y > p1.y && y > p3.y)
-							context.point(x,y);
-					}
-				}
-				else if (k1 > 0 && k2 > 0) {
-					if (y < y1 && y > y2) {
-						if (y > p1.y && y > p3.y)
-							context.point(x,y);
-					}
-				}
-				else if (k1 <0 && k2 < 0){
-					if (y > y1 && y < y2){
-						if (y > p1.y && y > p3.y)
-							context.point(x,y);
-					}
-				}
-			}
-		}
-	}
-	function triangle_bottom() {
-		console.log("drawing bottom");
-	}
-
-	if (p1.y == p3.y && p1.y < p2.y)
-		triangle_top();
-	else 
-		triangle_bottom();
+	context.putImageData(canvasData, 0, 0);
 }
