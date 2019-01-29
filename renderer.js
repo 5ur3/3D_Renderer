@@ -43,7 +43,9 @@ function render(camera) {
 	}
 
 	let canvasData = context.getImageData(0, 0, canvas.width, canvas.height);
-	function triangle(point1, point2, point3, r, g, b) {
+	let depth = new Array(canvas.width * canvas.height);
+
+	function triangle(point1, point2, point3, p1_3, p2_3, p3_3, r, g, b) {
 		let p1 = new Vector(Math.floor(point1.x), Math.floor(point1.y));
 		let p2 = new Vector(Math.floor(point2.x), Math.floor(point2.y));
 		let p3 = new Vector(Math.floor(point3.x), Math.floor(point3.y));
@@ -72,11 +74,22 @@ function render(camera) {
 		let midpoint = new Vector((p1.x + p2.x + p3.x) / 3, (p1.y + p2.y + p3.y) / 3);
 		
 		function point(x, y) {
-			let index = (x + y * canvas.width) * 4;
-			canvasData.data[index + 0] = r;
-		    canvasData.data[index + 1] = g;
-		    canvasData.data[index + 2] = b;
-			canvasData.data[index + 3] = 255;
+			// trash line
+			let side_lerp = Vector.angle(Vector.substract(new Vector(x, y), point1), Vector.substract(point2, point1)) / Vector.angle(Vector.substract(point3, point1), Vector.substract(point2, point1));
+			let side_point = Vector.lerp(point2, point3, side_lerp);
+			let side_point_3 = Vector.lerp(p2_3, p3_3, side_lerp);
+			let point_lerp = Vector.distance(point1, new Vector(x, y)) / Vector.distance(point1, side_point);
+			let point_3 = Vector.lerp(p1_3, side_point_3, point_lerp);
+			let point_depth = Vector.distance(camera.position, point_3);
+
+			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
+				let index = (x + y * canvas.width) * 4;
+				canvasData.data[index + 0] = r;
+			    canvasData.data[index + 1] = g;
+			    canvasData.data[index + 2] = b;
+				canvasData.data[index + 3] = 255;
+				depth[x + y * canvas.width] = point_depth;
+			}
 		}
 		for (let x = min.x; x < max.x; x++) {
 			for (let y = min.y; y < max.y; y++) {
@@ -111,6 +124,7 @@ function render(camera) {
 		for (let poly = 0; poly < polygons.length; poly++) {
 			let points = [];
 			let inView = 0;
+			let vertices = [];
 			draw_poly: {
 				for (let i = 0; i < 3; i++) {
 					polygons[poly][i] = Vector.substract(polygons[poly][i], objects[object].center);
@@ -120,6 +134,7 @@ function render(camera) {
 					let vertex = new Vector(polygons[poly][i].x * objects[object].scale.x + objects[object].position.x, 
 											polygons[poly][i].y * objects[object].scale.y + objects[object].position.y, 
 											polygons[poly][i].z * objects[object].scale.z + objects[object].position.z); // vertex pos in space
+					vertices.push(vertex);
 					if (objects[object].mesh.normals.length > 0) {
 						let normal = objects[object].mesh.normals[poly].copy;
 						normal = rotate(normal, x, objects[object].rotation.x);
@@ -149,7 +164,9 @@ function render(camera) {
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
 				}
 				if (inView)
-					triangle(points[0], points[1], points[2], object * (256 / objects.length) % 255, poly * (256 / polygons.length) % 255, 127);
+					triangle(points[0], points[1], points[2], 
+						     vertices[0], vertices[1], vertices[2],
+						     object * (256 / objects.length) % 255, poly * (256 / polygons.length) % 255, 127);
 			}
 		}
 	}

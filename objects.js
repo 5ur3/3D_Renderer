@@ -45,6 +45,9 @@ class Vector {
 	static cross(vector1, vector2) {
 		return new Vector(vector1.y * vector2.z - vector1.z * vector2.y, vector1.z * vector2.x - vector1.x * vector2.z, vector1.x * vector2.y - vector1.y * vector2.x);
 	}
+	static lerp(vector1, vector2, value) {
+		return new Vector(vector1.x + (vector2.x - vector1.x) * value, vector1.y + (vector2.y - vector1.y) * value, vector1.z + (vector2.z - vector1.z) * value);
+	}
 
 	distance(pos2) {
 		return Vector.distance(this, pos2);

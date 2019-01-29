@@ -18,3 +18,7 @@ function loadFile(filePath) {
 	}
 	return result;
 }
+
+function lerp(val1, val2, val) {
+	return val1 + (val2 - val1) * val;
+}
