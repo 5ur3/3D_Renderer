@@ -166,7 +166,7 @@ function render(camera) {
 				if (inView)
 					triangle(points[0], points[1], points[2], 
 						     vertices[0], vertices[1], vertices[2],
-						     object * (256 / objects.length) % 255, poly * (256 / polygons.length) % 255, 127);
+						     object * (256 / objects.length) % 256, poly * (256 / polygons.length) % 256, 255);
 			}
 		}
 	}
