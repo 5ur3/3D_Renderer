@@ -9,21 +9,25 @@
 			[get] copy: Vector // Возвращает копию вектора объекта
 		}
 		Функции объекта {
-			move(: Vector) : void // Передвигает вектор объекта на вектор
-			multiply(factor: Number) : void // Умножает каждый компонент вектора на число.
+			add(: Vector) : Vector // Добавляет к вектору объекта вектор и возвращает полученный вектор
+			substract(: Vector) : Vector // Вычитает от вектора объекта вектор и возвращает полученный вектор
+			multiply(factor: Number) : Vector // Умножает каждый компонент вектора на число и возвращает полученный вектор
+			divide(factor: Number) : Vector // Делит каждый компонент вектора на число и возвращает полученный вектор
 			distance(: Vector) : Number // Возвращает расстояние между вектором объекта и аргументом
 			angle(: Vector) : Number [0; +Math.PI] // Возвращает угол между вектором объекта и аргументом
 			cross(: Vector) : Vector // Возвращает вектор, перпендикулярный к вектору объекта и аргументу
 		}
 
 		Статичные функции {
-			Vector.distance(vector1: Vector, vector2: Vector) : Number // Возвращает расстояние между векторами
+			Vector.distance_squared(vector1: Vector, vector2: Vector) : Number // Возвращает квадрат расстояния между точками
+			Vector.distance(vector1: Vector, vector2: Vector) : Number // Возвращает расстояние между точками
 			Vector.length(vector: Vector) : Number // Возвращает длину вектора
 			Vector.angle(vector1: Vector, vector2: Vector) : Number [-Math.PI; +Math.PI] // Возвращает угол между векторами
 			Vector.normalize(vector: Vector) : Vector // Возвращает вектор, направление которого совпадает с вектором аргумента, а длина равна 1
 			Vector.add(vector1: Vector, vector2: Vector) : Vector // Возвращает vector1 + vector2
 			Vector.substract(vector1: Vector, vector2: Vector) : Vector // Возвращает vector1 - vector2
 			Vector.multiply(vector: Vector, factor: Number) : Vector // Возвращает вектор, полученный в результате перемножения каждого компонента вектора на число
+			Vector.divide(vector: Vector, factor: Number) : Vector // Возвращает вектор, полученный в результате деления каждого компонента вектора на число
 			Vector.cross(Vector, Vector) : Vector // Возвращает вектор, перпендикулярный сразу к двум векторам
 		}
 	}
@@ -71,6 +75,8 @@
 }
 
 Глобальные функции {
+	lerp(val1: Number, val2: Number, val) : Number // Возвращает посчитанное по следующей формуле число: val1 + (val2 - val1) * val;
+	point_in_triangle(point: Vector, vertex1: Vector, vertex2: Vector, vertex3: Vector) Возвращает true если точка point находится внутри треугольника с вершинами vertex1, vertex2, vertex3. Иначе возвращает false
 	render(camera: Camera) : void // Выводит изображение с камеры на экран
 	loadFile(path: Str) : Str // Возвращает содержание текстового файла. 
 }

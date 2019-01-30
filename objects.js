@@ -13,24 +13,17 @@ class Vector {
 		else
 			this.z = 0;
 	}
-
-	move(vector) {
-		this.x += vector.x;
-		this.y += vector.y;
-		this.z += vector.z;
+	static distance_squared(pos1, pos2) {
+		return Math.pow((pos2.x - pos1.x), 2) + Math.pow((pos2.y - pos1.y), 2) + Math.pow((pos2.z - pos1.z), 2);
 	}
-
 	static distance(pos1, pos2) {
-		return Math.sqrt(Math.pow((pos2.x - pos1.x), 2) + Math.pow((pos2.y - pos1.y), 2) + Math.pow((pos2.z - pos1.z), 2));
+		return Math.sqrt(Vector.distance_squared(pos1, pos2));
 	}
 	static length(vector) {
 		return Vector.distance(new Vector(), vector);
 	}
 	static angle(vector1, vector2) {
 		return Math.acos(Math.min(Math.max((vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z) / (Vector.length(vector1) * Vector.length(vector2)), -1), 1));
-	}
-	static multiply(vector, factor) {
-		return new Vector(vector.x * factor, vector.y * factor, vector.z * factor);
 	}
 	static normalize(vector) { 
 		let scale = 1 / vector.length;
@@ -42,11 +35,17 @@ class Vector {
 	static substract(vector1, vector2) {
 		return new Vector(vector1.x - vector2.x, vector1.y - vector2.y, vector1.z - vector2.z);
 	}
+	static multiply(vector, factor) {
+		return new Vector(vector.x * factor, vector.y * factor, vector.z * factor);
+	}
+	static divide(vector, factor) {
+		return new Vector(vector.x / factor, vector.y / factor, vector.z / factor);
+	}
 	static cross(vector1, vector2) {
 		return new Vector(vector1.y * vector2.z - vector1.z * vector2.y, vector1.z * vector2.x - vector1.x * vector2.z, vector1.x * vector2.y - vector1.y * vector2.x);
 	}
 	static lerp(vector1, vector2, value) {
-		return new Vector(vector1.x + (vector2.x - vector1.x) * value, vector1.y + (vector2.y - vector1.y) * value, vector1.z + (vector2.z - vector1.z) * value);
+		return new Vector(lerp(vector1.x, vector2.x, value), lerp(vector1.y, vector2.y, value), lerp(vector1.z, vector2.z, value));
 	}
 
 	distance(pos2) {
@@ -55,11 +54,31 @@ class Vector {
 	angle(vector2) {
 		return Vector.angle(this, vector2);
 	}
+	add(vector) {
+		this.x += vector.x;
+		this.y += vector.y;
+		this.z += vector.z;
+		return this;
+	}
+	substract(vector) {
+		this.x -= vector.x;
+		this.y -= vector.y;
+		this.z -= vector.z;
+		return this;
+	}
 	multiply(factor) {
 		this.x *= factor;
 		this.y *= factor;
 		this.z *= factor;
+		return this;
 	}
+	divide(factor) {
+		this.x /= factor;
+		this.y /= factor;
+		this.z /= factor;
+		return this;
+	}
+
 
 	get length() {
 		return Vector.length(this);
@@ -140,7 +159,7 @@ class Mesh {
 					normals.push(Vector.cross(Vector.substract(vertices[Number(line[1].split('/')[0]) - 1], vertices[Number(line[2].split('/')[0]) - 1]).normalized, 
 											  Vector.substract(vertices[Number(line[2].split('/')[0]) - 1], vertices[Number(line[3].split('/')[0]) - 1]).normalized));
 					normals.push(Vector.cross(Vector.substract(vertices[Number(line[3].split('/')[0]) - 1], vertices[Number(line[4].split('/')[0]) - 1]).normalized, 
-												  Vector.substract(vertices[Number(line[4].split('/')[0]) - 1], vertices[Number(line[1].split('/')[0]) - 1]).normalized));
+											  Vector.substract(vertices[Number(line[4].split('/')[0]) - 1], vertices[Number(line[1].split('/')[0]) - 1]).normalized));
 					for (let i = 1; i < 5; i++) {
 						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
 							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
@@ -167,7 +186,7 @@ class Mesh {
 		let scale = 1 / Math.max(max.x - min.x, Math.max(max.y - min.y, max.z - min.z));
 		for (let i = 0; i < mesh.length; i++) {
 			for (let j = 0; j < 3; j++) {
-				mesh[i][j].move(move);
+				mesh[i][j].add(move);
 				mesh[i][j].multiply(scale);
 			}
 		}

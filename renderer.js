@@ -45,43 +45,33 @@ function render(camera) {
 	let canvasData = context.getImageData(0, 0, canvas.width, canvas.height);
 	let depth = new Array(canvas.width * canvas.height);
 
-	function triangle(point1, point2, point3, p1_3, p2_3, p3_3, r, g, b) {
-		let p1 = new Vector(Math.floor(point1.x), Math.floor(point1.y));
-		let p2 = new Vector(Math.floor(point2.x), Math.floor(point2.y));
-		let p3 = new Vector(Math.floor(point3.x), Math.floor(point3.y));
+	function triangle(vertex1, vertex2, vertex3, v1_3, v2_3, v3_3, r, g, b) {
+		let v1 = new Vector(Math.floor(vertex1.x), Math.floor(vertex1.y));
+		let v2 = new Vector(Math.floor(vertex2.x), Math.floor(vertex2.y));
+		let v3 = new Vector(Math.floor(vertex3.x), Math.floor(vertex3.y));
 
-		if (p1.x == p2.x && p2.x == p3.x || 
-			p1.y == p2.y && p2.y == p3.y ||
-			p1.x == p2.x && p1.y == p2.y ||
-			p2.x == p3.x && p2.y == p3.y ||
-			p3.x == p1.x && p3.y == p1.y)
-			return;
-
-		let k1 = (p1.y - p2.y) / (p1.x - p2.x);
-		let k2 = (p2.y - p3.y) / (p2.x - p3.x);
-		let k3 = (p3.y - p1.y) / (p3.x - p1.x);
-		let m1 = p1.y - k1 * p1.x;
-		let m2 = p2.y - k2 * p2.x;
-		let m3 = p3.y - k3 * p3.x;
-
-		if (k1 == k2 || 
-			k2 == k3 ||
-			k3 == k1)
-			return;
-
-		let min = new Vector(Math.min(Math.min(p1.x, p2.x), p3.x), Math.min(Math.min(p1.y, p2.y), p3.y));
-		let max = new Vector(Math.max(Math.max(p1.x, p2.x), p3.x), Math.max(Math.max(p1.y, p2.y), p3.y));
-		let midpoint = new Vector((p1.x + p2.x + p3.x) / 3, (p1.y + p2.y + p3.y) / 3);
+		let min = new Vector(Math.min(Math.min(v1.x, v2.x), v3.x), Math.min(Math.min(v1.y, v2.y), v3.y));
+		let max = new Vector(Math.max(Math.max(v1.x, v2.x), v3.x), Math.max(Math.max(v1.y, v2.y), v3.y));
 		
 		function point(x, y) {
-			// trash line
-			let side_lerp = Vector.angle(Vector.substract(new Vector(x, y), point1), Vector.substract(point2, point1)) / Vector.angle(Vector.substract(point3, point1), Vector.substract(point2, point1));
-			let side_point = Vector.lerp(point2, point3, side_lerp);
-			let side_point_3 = Vector.lerp(p2_3, p3_3, side_lerp);
-			let point_lerp = Vector.distance(point1, new Vector(x, y)) / Vector.distance(point1, side_point);
-			let point_3 = Vector.lerp(p1_3, side_point_3, point_lerp);
-			let point_depth = Vector.distance(camera.position, point_3);
+			function point_3() {
+				function _point_3(_v1, _v2, _v3, _v1_3, _v2_3, _v3_3, i) {
+					let midpoint = Vector.add(_v1, _v2).add(_v3).divide(3);
+					let midpoint_3 = Vector.add(_v1_3, _v2_3).add(_v3_3).divide(3);
+					if (!i) 
+						return midpoint_3;
+					if (point_in_triangle(new Vector(x, y), _v1, _v2, midpoint))
+						return _point_3(_v1, _v2, midpoint, _v1_3, _v2_3, midpoint_3, i - 1);
+					if (point_in_triangle(new Vector(x, y), _v1, midpoint, _v3))
+						return _point_3(_v1, midpoint, _v3, _v1_3, midpoint_3, _v3_3, i - 1);
+					if (point_in_triangle(new Vector(x, y), midpoint, _v2, _v3))
+						return _point_3(midpoint, _v2, _v3, midpoint_3, _v2_3, _v3_3, i - 1);
+					return midpoint_3;
+				}
+				return _point_3(vertex1, vertex2, vertex3, v1_3, v2_3, v3_3, 50);
+			}
 
+			let point_depth = Vector.distance_squared(camera.position, point_3());
 			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
 				let index = (x + y * canvas.width) * 4;
 				canvasData.data[index + 0] = r;
@@ -93,12 +83,7 @@ function render(camera) {
 		}
 		for (let x = min.x; x < max.x; x++) {
 			for (let y = min.y; y < max.y; y++) {
-				if ((((k1 == Infinity || k1 == -Infinity) && ((midpoint.x < p1.x && x < p1.x) || (midpoint.x >= p1.x && x >= p1.x))) || 
-					 (k1 != Infinity && (((midpoint.y < k1 * midpoint.x + m1) && y < k1 * x + m1) || ((midpoint.y >= k1 * midpoint.x + m1)) && y >= k1 * x + m1))) &&
-					(((k2 == Infinity || k2 == -Infinity) && ((midpoint.x < p2.x && x < p2.x) || (midpoint.x >= p2.x && x >= p2.x))) || 
-					 (k2 != Infinity && (((midpoint.y < k2 * midpoint.x + m2) && y < k2 * x + m2) || ((midpoint.y >= k2 * midpoint.x + m2)) && y >= k2 * x + m2))) &&
-					(((k3 == Infinity || k3 == -Infinity) && ((midpoint.x < p3.x && x < p3.x) || (midpoint.x >= p3.x && x >= p3.x))) || 
-					 (k3 != Infinity && (((midpoint.y < k3 * midpoint.x + m3) && y < k3 * x + m3) || ((midpoint.y >= k3 * midpoint.x + m3)) && y >= k3 * x + m3))))
+				if (point_in_triangle(new Vector(x, y), v1, v2, v3))
 					point(x, y);
 			}
 		}
@@ -166,7 +151,7 @@ function render(camera) {
 				if (inView)
 					triangle(points[0], points[1], points[2], 
 						     vertices[0], vertices[1], vertices[2],
-						     object * (256 / objects.length) % 255, poly * (256 / polygons.length) % 255, 127);
+						     object * (256 / objects.length) % 255, poly * (256 / polygons.length) % 255, 255);
 			}
 		}
 	}
