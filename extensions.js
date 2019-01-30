@@ -8,14 +8,13 @@ Array.prototype.clone = function() {
 	return this.slice(0);
 };
 
-function loadFile(filePath) {
-	var result = null;
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("GET", filePath, false);
-	xmlhttp.send();
-	if (xmlhttp.status==200) {
-	result = xmlhttp.responseText;
-	}
+function load_file(filePath) {
+	let result = null;
+	let xml_http = new XMLHttpRequest();
+	xml_http.open("GET", filePath, false);
+	xml_http.send();
+	if (xml_http.status==200)
+		result = xml_http.responseText;
 	return result;
 }
 

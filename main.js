@@ -11,10 +11,11 @@ let speed = .5;
 let amp = 7;
 
 let angle = 0;
-function update() {
+
+//function update() {
 	camera.position = new Vector(Math.sin(angle * speed) * amp, Math.cos(angle * speed * 1.7) * 2 + 0.5, Math.cos(angle * speed) * amp);
 	camera.look(Vector.substract(cat.position, camera.position));
 
 	angle += Math.PI / 180;
 	render(camera);
-}
+//}

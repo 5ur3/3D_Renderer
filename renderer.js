@@ -42,7 +42,7 @@ function render(camera) {
 		}
 	}
 
-	let canvasData = context.getImageData(0, 0, canvas.width, canvas.height);
+	let canvas_data = context.getImageData(0, 0, canvas.width, canvas.height);
 	let depth = new Array(canvas.width * canvas.height);
 
 	function triangle(vertex1, vertex2, vertex3, v1_3, v2_3, v3_3, r, g, b) {
@@ -74,10 +74,10 @@ function render(camera) {
 			let point_depth = Vector.distance_squared(camera.position, point_3());
 			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
 				let index = (x + y * canvas.width) * 4;
-				canvasData.data[index + 0] = r;
-			    canvasData.data[index + 1] = g;
-			    canvasData.data[index + 2] = b;
-				canvasData.data[index + 3] = 255;
+				canvas_data.data[index + 0] = r;
+			    canvas_data.data[index + 1] = g;
+			    canvas_data.data[index + 2] = b;
+				canvas_data.data[index + 3] = 255;
 				depth[x + y * canvas.width] = point_depth;
 			}
 		}
@@ -142,10 +142,10 @@ function render(camera) {
 					if (vertical_angle > Math.PI / 2)
 						plane_angle += 2 * (Math.PI - plane_angle);
 					let plane_vector = (new Vector(Math.cos(plane_angle), -Math.sin(plane_angle))).normalized;
-					if (angle <= (camera.viewAngle * Math.PI / 180) / 2) 
+					if (angle <= (camera.field_of_view * Math.PI / 180) / 2) 
 						inView = 1;
-					x = plane_vector.x * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
-					y = plane_vector.y * (angle / ((camera.viewAngle * Math.PI / 180) / 2)) * (screenSize / 2);
+					x = plane_vector.x * (angle / ((camera.field_of_view * Math.PI / 180) / 2)) * (screenSize / 2);
+					y = plane_vector.y * (angle / ((camera.field_of_view * Math.PI / 180) / 2)) * (screenSize / 2);
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
 				}
 				if (inView)
@@ -155,5 +155,5 @@ function render(camera) {
 			}
 		}
 	}
-	context.putImageData(canvasData, 0, 0);
+	context.putImageData(canvas_data, 0, 0);
 }
