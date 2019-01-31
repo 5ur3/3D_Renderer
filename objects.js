@@ -109,8 +109,8 @@ class Mesh {
 		}
 	}
 
-	static loadObject(path) {
-		let file = loadFile(path);
+	static load_object(path) {
+		let file = load_file(path);
 		let data = file.split("\n");
 
 		let vertices = [];
@@ -200,26 +200,26 @@ class Mesh {
 	}
 
 	static get cube() {
-		return Mesh.loadObject("obj/cube.obj");
+		return Mesh.load_object("obj/cube.obj");
 	}
 	static get sphere() {
-		return Mesh.loadObject("obj/sphere.obj");
+		return Mesh.load_object("obj/sphere.obj");
 	}
 	static get cylinder() {
-		return Mesh.loadObject("obj/cylinder.obj");
+		return Mesh.load_object("obj/cylinder.obj");
 	}
 	static get pyramid() {
-		return Mesh.loadObject("obj/pyramid.obj");
+		return Mesh.load_object("obj/pyramid.obj");
 	}
 
 	static get cat() {
-		return Mesh.loadObject("obj/cat.obj");
+		return Mesh.load_object("obj/cat.obj");
 	}
 	static get cat_lpoly() {
-		return Mesh.loadObject("obj/cat_lpoly.obj");
+		return Mesh.load_object("obj/cat_lpoly.obj");
 	}
 	static get deer() {
-		return Mesh.loadObject("obj/deer.obj");
+		return Mesh.load_object("obj/deer.obj");
 	}
 }
 
@@ -238,7 +238,7 @@ class Camera {
 	constructor() {
 		this.position = new Vector(0, 0, -10);
 		this.rotation = new Vector(0, 0, 0);
-		this.viewAngle = 90;
+		this.field_of_view = 90;
 	}
 
 	look(vector) {

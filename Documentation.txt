@@ -44,7 +44,7 @@
 			Mesh.cat: Mesh // Лоу-поли модель кота
 		}
 		Статичные функции {
-			loadObject(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
+			load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
 		}
 	}
 	Object3D {
@@ -60,7 +60,7 @@
 		Атрибуты объекта {
 			position: Vector (0, 0, -10)
 			rotation: Vector (0, 0, 0)
-			viewAngle: Number (90) // Угол обзора камеры
+			field_of_view: Number (90) // Угол обзора камеры
 		}
 		Функции объекта {
 			look(direction: Vector) : void // Поворачивает камеру по вектору
@@ -79,7 +79,7 @@
 Глобальные функции {
 	lerp(val1: Number, val2: Number, val) : Number // Возвращает посчитанное по следующей формуле число: val1 + (val2 - val1) * val;
 	render(camera: Camera) : void // Выводит изображение с камеры на экран
-	loadFile(path: Str) : Str // Возвращает содержание текстового файла. 
+	load_file(path: Str) : Str // Возвращает содержание текстового файла. 
 }
 
 Пользовательские функции {
