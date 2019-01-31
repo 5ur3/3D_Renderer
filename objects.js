@@ -50,6 +50,9 @@ class Vector {
 	static dot(vector1, vector2) {
 		return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
 	}
+	static equal(vector1, vector2) {
+		return(vector1.x == vector2.x && vector1.y == vector2.y && vector1.z == vector2.z);
+	}
 
 	distance(pos2) {
 		return Vector.distance(this, pos2);
@@ -84,7 +87,10 @@ class Vector {
 	dot(vector) {
 		return Vector.dot(this, vector);
 	}
-
+	equal(vector) {
+		return Vector.equal(this, vector);
+	}
+	
 
 	get length() {
 		return Vector.length(this);

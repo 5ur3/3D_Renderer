@@ -56,11 +56,14 @@ function render(camera) {
 
 		let v1 = Vector.substract(vertex2, vertex1);
 		let v2 = Vector.substract(vertex3, vertex1);
+
 		let dot11 = v1.dot(v1);
 		let dot12 = v1.dot(v2);
 		let dot22 = v2.dot(v2);
 		let dot11_22_m_dot12_12 = dot22 * dot11 - dot12 * dot12;
-		
+		if (!dot11_22_m_dot12_12) 
+			return;
+
 		function point(x, y) {
 			let v = Vector.substract(new Vector(x, y), vertex1);
 			let dot01 = v.dot(v1);
@@ -108,6 +111,11 @@ function render(camera) {
 			let points = [];
 			let inView = 0;
 			let vertices = [];
+			let normal = objects[object].mesh.normals[poly].copy;
+			normal = rotate(normal, x, objects[object].rotation.x);
+			normal = rotate(normal, y, objects[object].rotation.y);
+			normal = rotate(normal, z, objects[object].rotation.z);
+			
 			draw_poly: {
 				for (let i = 0; i < 3; i++) {
 					polygons[poly][i] = Vector.substract(polygons[poly][i], objects[object].center);
@@ -118,14 +126,8 @@ function render(camera) {
 											polygons[poly][i].y * objects[object].scale.y + objects[object].position.y, 
 											polygons[poly][i].z * objects[object].scale.z + objects[object].position.z); // vertex pos in space
 					vertices.push(vertex);
-					if (objects[object].mesh.normals.length > 0) {
-						let normal = objects[object].mesh.normals[poly].copy;
-						normal = rotate(normal, x, objects[object].rotation.x);
-						normal = rotate(normal, y, objects[object].rotation.y);
-						normal = rotate(normal, z, objects[object].rotation.z);
-						if (Vector.angle(normal, Vector.substract(vertex, camera.position)) < Math.PI / 2)
-							break draw_poly;
-					}
+					if (Vector.angle(normal, Vector.substract(vertex, camera.position)) < Math.PI / 2)
+						break draw_poly;
 					let vertex2cam = new Vector(vertex.x - camera.position.x, vertex.y - camera.position.y, vertex.z - camera.position.z); // vertex pos in camera space
 					let angle = Vector.angle(vertex2cam, forward); // angle btw camera's view vector and vector from camera to vertex pos
 					let cam2plane = new Vector(forward.x * Math.cos(angle) * vertex2cam.length, 
@@ -146,10 +148,10 @@ function render(camera) {
 					y = plane_vector.y * (angle / ((camera.field_of_view * Math.PI / 180) / 2)) * (screenSize / 2);
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
 				}
-				if (inView)
-					triangle(points[0], points[1], points[2], 
-						     vertices[0], vertices[1], vertices[2],
-						     object * (256 / objects.length) % 256, poly * (256 / polygons.length) % 256, 255);
+				if (inView) {
+					let color = Math.floor(lerp(205, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
+					triangle(points[0], points[1], points[2], vertices[0], vertices[1], vertices[2], color, color, color);
+				}
 			}
 		}
 	}

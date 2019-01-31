@@ -15,8 +15,9 @@
 			divide(factor: Number) : Vector // Делит каждый компонент вектора на число и возвращает полученный вектор
 			distance(: Vector) : Number // Возвращает расстояние между вектором объекта и аргументом
 			angle(: Vector) : Number [0; +Math.PI] // Возвращает угол между вектором объекта и аргументом
-			cross(: Vector) : Vector // Возвращает вектор, перпендикулярный к вектору объекта и аргументу
 			dot(: Vector) : Number // Возвращает скалярное произведение вектора объекта и аргумента
+			cross(: Vector) : Vector // Возвращает вектор, перпендикулярный к вектору объекта и аргументу
+			equal(: Vector) : Boolean // Возвращает true если вектор объекта равен вектору аргумента. Иначе возвращает false
 		}
 
 		Статичные функции {
@@ -31,6 +32,7 @@
 			Vector.divide(vector: Vector, factor: Number) : Vector // Возвращает вектор, полученный в результате деления каждого компонента вектора на число
 			Vector.dot(vector1: Vector, vector2: Vector) : Number // Возвращает скалярное произведение векторов
 			Vector.cross(vector1: Vector, vector2: Vector) : Vector // Возвращает вектор, перпендикулярный сразу к двум векторам
+			Vector.equal(vector1: Vector, vector2: Vector) : Boolean // Возвращает true если вектора равны. Иначе возвращает false
 		}
 	}
 	Mesh {
@@ -44,7 +46,7 @@
 			Mesh.cat: Mesh // Лоу-поли модель кота
 		}
 		Статичные функции {
-			load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
+			Mesh.load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
 		}
 	}
 	Object3D {
