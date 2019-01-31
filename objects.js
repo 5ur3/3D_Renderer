@@ -47,6 +47,9 @@ class Vector {
 	static lerp(vector1, vector2, value) {
 		return new Vector(lerp(vector1.x, vector2.x, value), lerp(vector1.y, vector2.y, value), lerp(vector1.z, vector2.z, value));
 	}
+	static dot(vector1, vector2) {
+		return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
+	}
 
 	distance(pos2) {
 		return Vector.distance(this, pos2);
@@ -77,6 +80,9 @@ class Vector {
 		this.y /= factor;
 		this.z /= factor;
 		return this;
+	}
+	dot(vector) {
+		return Vector.dot(this, vector);
 	}
 
 

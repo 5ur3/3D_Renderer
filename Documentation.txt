@@ -16,6 +16,7 @@
 			distance(: Vector) : Number // Возвращает расстояние между вектором объекта и аргументом
 			angle(: Vector) : Number [0; +Math.PI] // Возвращает угол между вектором объекта и аргументом
 			cross(: Vector) : Vector // Возвращает вектор, перпендикулярный к вектору объекта и аргументу
+			dot(: Vector) : Number // Возвращает скалярное произведение вектора объекта и аргумента
 		}
 
 		Статичные функции {
@@ -28,7 +29,8 @@
 			Vector.substract(vector1: Vector, vector2: Vector) : Vector // Возвращает vector1 - vector2
 			Vector.multiply(vector: Vector, factor: Number) : Vector // Возвращает вектор, полученный в результате перемножения каждого компонента вектора на число
 			Vector.divide(vector: Vector, factor: Number) : Vector // Возвращает вектор, полученный в результате деления каждого компонента вектора на число
-			Vector.cross(Vector, Vector) : Vector // Возвращает вектор, перпендикулярный сразу к двум векторам
+			Vector.dot(vector1: Vector, vector2: Vector) : Number // Возвращает скалярное произведение векторов
+			Vector.cross(vector1: Vector, vector2: Vector) : Vector // Возвращает вектор, перпендикулярный сразу к двум векторам
 		}
 	}
 	Mesh {
@@ -76,7 +78,6 @@
 
 Глобальные функции {
 	lerp(val1: Number, val2: Number, val) : Number // Возвращает посчитанное по следующей формуле число: val1 + (val2 - val1) * val;
-	point_in_triangle(point: Vector, vertex1: Vector, vertex2: Vector, vertex3: Vector) Возвращает true если точка point находится внутри треугольника с вершинами vertex1, vertex2, vertex3. Иначе возвращает false
 	render(camera: Camera) : void // Выводит изображение с камеры на экран
 	loadFile(path: Str) : Str // Возвращает содержание текстового файла. 
 }

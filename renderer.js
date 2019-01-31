@@ -46,32 +46,31 @@ function render(camera) {
 	let depth = new Array(canvas.width * canvas.height);
 
 	function triangle(vertex1, vertex2, vertex3, v1_3, v2_3, v3_3, r, g, b) {
-		let v1 = new Vector(Math.floor(vertex1.x), Math.floor(vertex1.y));
-		let v2 = new Vector(Math.floor(vertex2.x), Math.floor(vertex2.y));
-		let v3 = new Vector(Math.floor(vertex3.x), Math.floor(vertex3.y));
+		vertex1 = new Vector(Math.floor(vertex1.x), Math.floor(vertex1.y));
+		vertex2 = new Vector(Math.floor(vertex2.x), Math.floor(vertex2.y));
+		vertex3 = new Vector(Math.floor(vertex3.x), Math.floor(vertex3.y));
+		let min = new Vector(Math.min(Math.min(vertex1.x, vertex2.x), vertex3.x), 
+							 Math.min(Math.min(vertex1.y, vertex2.y), vertex3.y));
+		let max = new Vector(Math.max(Math.max(vertex1.x, vertex2.x), vertex3.x), 
+							 Math.max(Math.max(vertex1.y, vertex2.y), vertex3.y));
 
-		let min = new Vector(Math.min(Math.min(v1.x, v2.x), v3.x), Math.min(Math.min(v1.y, v2.y), v3.y));
-		let max = new Vector(Math.max(Math.max(v1.x, v2.x), v3.x), Math.max(Math.max(v1.y, v2.y), v3.y));
+		let v1 = Vector.substract(vertex2, vertex1);
+		let v2 = Vector.substract(vertex3, vertex1);
+		let dot11 = v1.dot(v1);
+		let dot12 = v1.dot(v2);
+		let dot22 = v2.dot(v2);
+		let dot11_22_m_dot12_12 = dot22 * dot11 - dot12 * dot12;
 		
 		function point(x, y) {
-			function point_3() {
-				function _point_3(_v1, _v2, _v3, _v1_3, _v2_3, _v3_3, i) {
-					let midpoint = Vector.add(_v1, _v2).add(_v3).divide(3);
-					let midpoint_3 = Vector.add(_v1_3, _v2_3).add(_v3_3).divide(3);
-					if (!i) 
-						return midpoint_3;
-					if (point_in_triangle(new Vector(x, y), _v1, _v2, midpoint))
-						return _point_3(_v1, _v2, midpoint, _v1_3, _v2_3, midpoint_3, i - 1);
-					if (point_in_triangle(new Vector(x, y), _v1, midpoint, _v3))
-						return _point_3(_v1, midpoint, _v3, _v1_3, midpoint_3, _v3_3, i - 1);
-					if (point_in_triangle(new Vector(x, y), midpoint, _v2, _v3))
-						return _point_3(midpoint, _v2, _v3, midpoint_3, _v2_3, _v3_3, i - 1);
-					return midpoint_3;
-				}
-				return _point_3(vertex1, vertex2, vertex3, v1_3, v2_3, v3_3, 50);
-			}
+			let v = Vector.substract(new Vector(x, y), vertex1);
+			let dot01 = v.dot(v1);
+			let dot02 = v.dot(v2);
+			let U = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12;
+			let V = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12;
+			if (U < 0 || V < 0 || U + V > 1)
+				return;
 
-			let point_depth = Vector.distance_squared(camera.position, point_3());
+			let point_depth = Vector.distance_squared(camera.position, Vector.add(Vector.substract(v2_3, v1_3).multiply(V), Vector.substract(v3_3, v1_3).multiply(U)).add(v1_3));
 			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
 				let index = (x + y * canvas.width) * 4;
 				canvasData.data[index + 0] = r;
@@ -83,8 +82,7 @@ function render(camera) {
 		}
 		for (let x = min.x; x < max.x; x++) {
 			for (let y = min.y; y < max.y; y++) {
-				if (point_in_triangle(new Vector(x, y), v1, v2, v3))
-					point(x, y);
+				point(x, y);
 			}
 		}
 	}
