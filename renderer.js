@@ -3,7 +3,31 @@ function render(camera) {
 	screenSize = (new Vector(canvas.width, canvas.height)).length;
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	context.fillStyle = "#000000";
-	context.fillText(Math.floor(1000 / ((new Date).getTime() - render_time)) + " FPS", 1, 10);
+	context.font = "15px Courier";
+	let fps = Math.floor(1000 / ((new Date).getTime() - render_time));
+	context.fillText(fps + " КвС", 1, 10);
+	if (properties.quality_auto) {
+		if (fps < 10 && properties.quality < 4)
+			properties.quality++;
+		if (fps > 30 && properties.quality > 1)
+			properties.quality--;
+	}
+
+	context.fillText("Считать", canvas.width - 250, 10);
+	context.fillStyle = "#0000FF";
+	context.fillText("Авт.", canvas.width - 250, 30);
+	context.fillText("100%", canvas.width - 200, 30);
+	context.fillText("50%", canvas.width - 150, 30);
+	context.fillText("33%", canvas.width - 100, 30);
+	context.fillText("25%", canvas.width - 50, 30);
+	context.fillStyle = "#000000";
+	if (properties.quality_auto) {
+		context.fillRect(canvas.width - 250, 35, 40, 1);
+		context.fillRect(canvas.width - 50 * (5 - properties.quality) + 5, 35, 20, 1);
+	}
+	else 
+		context.fillRect(canvas.width - 50 * (5 - properties.quality), 35, 40, 1);
+
 	render_time = (new Date).getTime();
 
 	let horizontal = new Vector(1, 0, 0);
@@ -75,16 +99,20 @@ function render(camera) {
 
 			let point_depth = Vector.distance_squared(camera.position, Vector.add(Vector.substract(v2_3, v1_3).multiply(V), Vector.substract(v3_3, v1_3).multiply(U)).add(v1_3));
 			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
-				let index = (x + y * canvas.width) * 4;
-				canvas_data.data[index + 0] = r;
-			    canvas_data.data[index + 1] = g;
-			    canvas_data.data[index + 2] = b;
-				canvas_data.data[index + 3] = 255;
+				for (let X = 0; X < properties.quality; X++) {
+					for (let Y = 0; Y < properties.quality; Y++) {
+						let index = (x + X + (y + Y) * canvas.width) * 4;
+						canvas_data.data[index + 0] = r;
+					    canvas_data.data[index + 1] = g;
+					    canvas_data.data[index + 2] = b;
+						canvas_data.data[index + 3] = 255;
+					}
+				}
 				depth[x + y * canvas.width] = point_depth;
 			}
 		}
-		for (let x = min.x; x < max.x; x++) {
-			for (let y = min.y; y < max.y; y++) {
+		for (let x = min.x - min.x % properties.quality; x < max.x; x += properties.quality) {
+			for (let y = min.y - min.y % properties.quality; y < max.y; y += properties.quality) {
 				point(x, y);
 			}
 		}
@@ -118,13 +146,16 @@ function render(camera) {
 			
 			draw_poly: {
 				for (let i = 0; i < 3; i++) {
+					polygons[poly][i] = new Vector(polygons[poly][i].x * objects[object].scale.x, 
+												   polygons[poly][i].y * objects[object].scale.y, 
+												   polygons[poly][i].z * objects[object].scale.z);
 					polygons[poly][i] = Vector.substract(polygons[poly][i], objects[object].center);
 					polygons[poly][i] = rotate(polygons[poly][i], x, objects[object].rotation.x);
 					polygons[poly][i] = rotate(polygons[poly][i], y, objects[object].rotation.y);
 					polygons[poly][i] = rotate(polygons[poly][i], z, objects[object].rotation.z);
-					let vertex = new Vector(polygons[poly][i].x * objects[object].scale.x + objects[object].position.x, 
-											polygons[poly][i].y * objects[object].scale.y + objects[object].position.y, 
-											polygons[poly][i].z * objects[object].scale.z + objects[object].position.z); // vertex pos in space
+					let vertex = new Vector(polygons[poly][i].x + objects[object].position.x, 
+											polygons[poly][i].y + objects[object].position.y, 
+											polygons[poly][i].z + objects[object].position.z); // vertex pos in space
 					vertices.push(vertex);
 					if (Vector.angle(normal, Vector.substract(vertex, camera.position)) < Math.PI / 2)
 						break draw_poly;

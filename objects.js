@@ -258,6 +258,8 @@ class Camera {
 class Properties {
 	constructor() {
 		this.framerate = 60;
+		this.quality_auto = 1;
+		this.quality = 1;
 	}
 }
 
