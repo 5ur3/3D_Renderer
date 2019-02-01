@@ -30,7 +30,7 @@ function onMouseUp(mouse) {
 }
 
 function onMouseWheel(wheel) {
-	lerp_position -= wheel.y / 3;
+	lerp_position -= wheel.y / Math.abs(wheel.y);
 }
 
 function update() {
