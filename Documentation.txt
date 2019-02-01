@@ -56,6 +56,8 @@
 			scale: Vector (1, 1, 1) // Множитель размера
 			mesh: Array (Mesh.cube) // Полигональная фигура
 			center: Vector (0, 0, 0) // Точка опоры объекта
+			enabled: Boolean (true)
+			color: Vector (1, 1, 1) [0; 1] // Множители каналов цвета R G и B на отрисовке
 		}
 	}
 	Camera {

@@ -129,6 +129,8 @@ function render(camera) {
 	forward = rotate(forward, z, camera.rotation.z);
 
 	for (let object = 0; object < objects.length; object++) {
+		if (!objects[object].enabled) 
+			continue;
 		let polygons = [];
 		for (let poly = 0; poly < objects[object].mesh.polygons.length; poly++) {
 			polygons.push([]);
@@ -180,8 +182,10 @@ function render(camera) {
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
 				}
 				if (inView) {
-					let color = Math.floor(lerp(205, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
-					triangle(points[0], points[1], points[2], vertices[0], vertices[1], vertices[2], color, color, color);
+					let color = Math.floor(lerp(240, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
+					triangle(points[0], points[1], points[2], 
+							 vertices[0], vertices[1], vertices[2], 
+							 Math.floor(color * objects[object].color.x), Math.floor(color * objects[object].color.y), Math.floor(color * objects[object].color.z));
 				}
 			}
 		}

@@ -205,6 +205,9 @@ class Mesh {
 		return new Mesh(mesh, normals);
 	}
 
+	static get empty() {
+		return new Mesh();
+	}
 	static get cube() {
 		return Mesh.load_object("obj/cube.obj");
 	}
@@ -236,6 +239,8 @@ class Object3D {
 		this.scale = new Vector(1, 1, 1);
 		this.center = new Vector();
 		this.mesh = Mesh.cube;	
+		this.color = new Vector(1, 1, 1);
+		this.enabled = 1;
 		objects.push(this);
 	}
 }
