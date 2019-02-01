@@ -5,7 +5,7 @@ function render(camera) {
 	context.fillStyle = "#000000";
 	context.font = "15px Courier";
 	let fps = Math.floor(1000 / ((new Date).getTime() - render_time));
-	context.fillText(fps + " КвС", 1, 10);
+	context.fillText(fps + " Кадр/с", 1, 10);
 	if (properties.quality_auto) {
 		if (fps < 10 && properties.quality < 4)
 			properties.quality++;
