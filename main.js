@@ -36,6 +36,7 @@ function onMouseWheel(wheel) {
 function update() {
 	cat.rotation = Vector.lerp(cat.rotation, lerp_rotation, speed);
 	stage.rotation = Vector.lerp(stage.rotation, lerp_rotation, speed);
+	camera.look(Vector.substract(cat.position, camera.position));
 	camera.position.z = lerp(camera.position.z, lerp_position, speed / 10);
 
 	render(camera);
