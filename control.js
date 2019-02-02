@@ -1,3 +1,5 @@
+//Данный скрипт отвечает за меню качества и за ввод пользователя
+
 if (typeof onMouseDown === "function") 
 	canvas.addEventListener("mousedown", onCanvasMouseDown);
 function onCanvasMouseDown(e) { 

@@ -1,3 +1,5 @@
+// Данный скрипт вызывает функцию update() если такая существует не более properties.framerate раз в секунду
+
 async function _call_update() {
 	if (typeof update === "function") {
 		while (1) {

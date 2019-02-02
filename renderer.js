@@ -2,6 +2,8 @@ let render_time = (new Date).getTime();
 function render(camera) {
 	screenSize = (new Vector(canvas.width, canvas.height)).length;
 	context.clearRect(0, 0, canvas.width, canvas.height);
+	// Отрисовка меню и счетчика количества кадров в секунду
+
 	context.fillStyle = "#000000";
 	context.font = "15px Courier";
 	let fps = Math.floor(1000 / ((new Date).getTime() - render_time));
@@ -34,6 +36,7 @@ function render(camera) {
 
 	render_time = (new Date).getTime();
 
+	// инициализация векторов камеры
 	let horizontal = new Vector(1, 0, 0);
 	let vertical = new Vector(0, 1, 0);
 	let forward = new Vector(0, 0, 1);
@@ -70,6 +73,7 @@ function render(camera) {
 		}
 	}
 
+	// инициализация буффера цвета и глубины пикселей
 	let canvas_data = context.getImageData(0, 0, canvas.width, canvas.height);
 	let depth = new Array(canvas.width * canvas.height);
 
@@ -96,12 +100,13 @@ function render(camera) {
 			let v = Vector.substract(new Vector(x, y), vertex1);
 			let dot01 = v.dot(v1);
 			let dot02 = v.dot(v2);
-			let U = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12;
-			let V = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12;
+			let U = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12;
+			let V = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12;
 			if (U < 0 || V < 0 || U + V > 1)
 				return;
 
-			let point_depth = Vector.distance_squared(camera.position, Vector.add(Vector.substract(v2_3, v1_3).multiply(V), Vector.substract(v3_3, v1_3).multiply(U)).add(v1_3));
+			let point_depth = Vector.distance_squared(camera.position, Vector.add(Vector.substract(v2_3, v1_3).multiply(U), Vector.substract(v3_3, v1_3).multiply(V)).add(v1_3));
+			// закрашивать пиксель только если он первый или выше предыдущего
 			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
 				for (let X = 0; X < properties.quality; X++) {
 					for (let Y = 0; Y < properties.quality; Y++) {
@@ -124,6 +129,7 @@ function render(camera) {
 		}
 	}
 
+	// вращение всех векторов камеры
 	vertical = rotate(vertical, x, camera.rotation.x);
 	vertical = rotate(vertical, y, camera.rotation.y);
 	vertical = rotate(vertical, z, camera.rotation.z);
@@ -137,6 +143,7 @@ function render(camera) {
 	for (let object = 0; object < objects.length; object++) {
 		if (!objects[object].enabled) 
 			continue;
+		// создание копии массива полигонов для дальнейшей модификации (вращения и т.п.)
 		let polygons = [];
 		for (let poly = 0; poly < objects[object].mesh.polygons.length; poly++) {
 			polygons.push([]);
@@ -145,8 +152,10 @@ function render(camera) {
 		}
 		for (let poly = 0; poly < polygons.length; poly++) {
 			let points = [];
+			// инициализация переменной, отвечающей за то, должен ли полигон рисоваться на экране
 			let inView = 0;
 			let vertices = [];
+			// получение нормали к плоскости
 			let normal = objects[object].mesh.normals[poly].copy;
 			normal = rotate(normal, x, objects[object].rotation.x);
 			normal = rotate(normal, y, objects[object].rotation.y);
@@ -154,6 +163,7 @@ function render(camera) {
 			
 			draw_poly: {
 				for (let i = 0; i < 3; i++) {
+					// скалирование, вращение и трансляция позиций вершин в глобальные координаты
 					polygons[poly][i] = new Vector(polygons[poly][i].x * objects[object].scale.x, 
 												   polygons[poly][i].y * objects[object].scale.y, 
 												   polygons[poly][i].z * objects[object].scale.z);
@@ -163,18 +173,18 @@ function render(camera) {
 					polygons[poly][i] = rotate(polygons[poly][i], z, objects[object].rotation.z);
 					let vertex = new Vector(polygons[poly][i].x + objects[object].position.x, 
 											polygons[poly][i].y + objects[object].position.y, 
-											polygons[poly][i].z + objects[object].position.z); // vertex pos in space
+											polygons[poly][i].z + objects[object].position.z); // позиция вершины в пространстве
 					vertices.push(vertex);
 					if (Vector.angle(normal, Vector.substract(vertex, camera.position)) < Math.PI / 2)
 						break draw_poly;
-					let vertex2cam = new Vector(vertex.x - camera.position.x, vertex.y - camera.position.y, vertex.z - camera.position.z); // vertex pos in camera space
-					let angle = Vector.angle(vertex2cam, forward); // angle btw camera's view vector and vector from camera to vertex pos
+					let vertex2cam = new Vector(vertex.x - camera.position.x, vertex.y - camera.position.y, vertex.z - camera.position.z); // позиция вершины в пространстве камеры
+					let angle = Vector.angle(vertex2cam, forward); // угол между нормалью камеры и вектором от камеры до позициии вершины
 					let cam2plane = new Vector(forward.x * Math.cos(angle) * vertex2cam.length, 
 											   forward.y * Math.cos(angle) * vertex2cam.length, 
-											   forward.z * Math.cos(angle) * vertex2cam.length); // vector from camera to plane's origin
+											   forward.z * Math.cos(angle) * vertex2cam.length); // точка, от которой будет проводится перпендикуляр в позицию вершины. Находится на нормали. 
 					let vertex2plane = new Vector(vertex2cam.x - cam2plane.x, 
 												  vertex2cam.y - cam2plane.y, 	
-												  vertex2cam.z - cam2plane.z); // vector from plane's origin to vertex
+												  vertex2cam.z - cam2plane.z); // вектор перпендикулярный нормали и идущий до позиции вершины В описании алгоритма называется вектор b
 					let horizontal_angle = Vector.angle(horizontal, vertex2plane);
 					let vertical_angle = Vector.angle(vertical, vertex2plane);
 					let plane_angle = horizontal_angle;
@@ -189,12 +199,14 @@ function render(camera) {
 				}
 				if (inView) {
 					if (!properties.wireframe) {
+						// Цвет полигона определяется углом между нормалью полигона и отрицательной нормалью камеры. Чем он меньше, тем цвет ярче. (Полигон ярче когда он повернут в камеру)
 						let color = Math.floor(lerp(240, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
 						triangle(points[0], points[1], points[2], 
 								 vertices[0], vertices[1], vertices[2], 
 								 Math.floor(color * objects[object].color.x), Math.floor(color * objects[object].color.y), Math.floor(color * objects[object].color.z));
 					}
 					else {
+						// соединение точек полигона линиями при wireframe рендере
 						context.strokeStyle = "#000000";
 						context.beginPath();
 						context.moveTo(points[0].x, points[0].y);
@@ -208,6 +220,7 @@ function render(camera) {
 			}
 		}
 	}
+	// Нанесение буффера цвета пикселей на холст
 	if (!properties.wireframe)
 		context.putImageData(canvas_data, 0, 0);
 }

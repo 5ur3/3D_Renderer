@@ -13,6 +13,7 @@ class Vector {
 		else
 			this.z = 0;
 	}
+	// Квадрат расстояния используется в тех случаях, когда нужно сравнить 2 расстояния.
 	static distance_squared(pos1, pos2) {
 		return Math.pow((pos2.x - pos1.x), 2) + Math.pow((pos2.y - pos1.y), 2) + Math.pow((pos2.z - pos1.z), 2);
 	}
@@ -133,7 +134,7 @@ class Mesh {
 			let line = data[i].split(/\s+/);
 			if (line[0] == "v") {
 				if (line.length != 4) {
-					alert("Invalid .obj file: vertices loading failed");
+					alert("Ошибка загрузки вершин. Пожалуйста, сообщите автору об ошибке: https://github.com/5ur3/3D_Renderer/issues");
 					return undefined;
 				}
 				vertices.push(new Vector(Number(line[1]), Number(line[2]), Number(line[3])));
@@ -188,12 +189,13 @@ class Mesh {
 							min.z = vertices[Number(line[i].split('/')[0]) - 1].z;
 					}
 				} else {
-					alert("Invalid .obj file: vertices loading failed");
+					alert("Ошибка загрузки плоскостей. Пожалуйста, сообщите автору об ошибке: https://github.com/5ur3/3D_Renderer/issues");
 					return undefined;
 				}
 			}
 		}
 
+		//Объект загружается таким образом, чтобы его центр был в точке (0, 0, 0), а максимальный размер в одной из осей был равен одному. Т.Е. чтобы ни одна точка не выходила за пределы куба (-0.5, -0.5, -0.5)-(0.5, 0.5, 0.5)
 		let move = Vector.substract(new Vector(), new Vector((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + min.z) / 2));
 		let scale = 1 / Math.max(max.x - min.x, Math.max(max.y - min.y, max.z - min.z));
 		for (let i = 0; i < mesh.length; i++) {

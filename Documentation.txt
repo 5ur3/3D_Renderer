@@ -42,8 +42,14 @@
 		}
 
 		Статичные поля {
-			Mesh.cube: Mesh // Полигональная фигура куба
-			Mesh.cat: Mesh // Лоу-поли модель кота
+			Mesh.empty: Mesh // Пустой mesh
+			Mesh.cube: Mesh // Куб
+			Mesh.sphere: Mesh // Сфера
+			Mesh.cylinder: Mesh // Цилиндр
+			Mesh.pyramid: Mesh // Пирамида
+			Mesh.cat: Mesh // Модель кота
+			Mesh.cat_lpoly: Mesh // Низкополигональная модель кота
+			Mesh.deer: Mesh // Олень
 		}
 		Статичные функции {
 			Mesh.load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
