@@ -21,6 +21,9 @@ function onCanvasMouseDown(e) {
 			properties.quality = 4;
 		}
 	}
+	else if (e.clientX > canvas.width - 250 && e.clientX <= canvas.width - 130 && e.clientY > 50 && e.clientY < 70) {
+		properties.wireframe = !properties.wireframe;
+	}
 	else
 		onMouseDown(new Vector(e.clientX, e.clientY));
 }

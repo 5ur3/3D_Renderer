@@ -39,18 +39,44 @@ stage3.center.y = 0.53;
 let deer4 = new Object3D();
 deer4.enabled = 0;
 deer4.mesh = Mesh.deer;
+//сцена 5
+let balls5 = new Array(20);
+let radius5 = 2;
+for (let i = 0; i < balls5.length; i++) {
+	balls5[i] = new Object3D();
+	balls5[i].mesh = Mesh.sphere;
+	balls5[i].scale.multiply(0.3);
+	balls5[i].enabled = 0;
+	balls5[i].center.x = Math.sin(i / balls5.length * Math.PI * 2) * radius5;
+	balls5[i].center.z = Math.cos(i / balls5.length * Math.PI * 2) * radius5;
+}
+let plane5 = new Object3D();
+plane5.position.y = -1;
+plane5.scale.y = 0.01;
+plane5.enabled = 0;
+plane5.color = new Vector(0.2, 0.2, 0.2);
+let ball5 = new Object3D();
+ball5.scale.multiply(0.5);
+ball5.position.y = 2;
+ball5.mesh = Mesh.sphere;
+ball5.enabled = 0;
+ball5.color = new Vector(0.8, 0.8, 0.2);
+let ball5_speed = 0;
 
 let speed = 0.1;
 
 let mouse_last = 0;
 let mouse_down = 0;
-let lerp_rotation = cat3.rotation;
-let lerp_position = camera.position.z;
+let obj_lerp_rotation = new Vector(0, 180, 0);
+let cam_lerp_position = camera.position;
+let cam_lerp_rotation = camera.rotation;
 
 function onMouseDown(mouse) {
 	if (mouse.y > canvas.height - 30) {
-		for (let i = 1; i <= 4; i++) {
+		for (let i = 1; i <= 5; i++) {
 			if (mouse.x > 50 + i * 20 && mouse.x <= 70 + i * 20) {
+				cam_lerp_position = new Vector(0, 0, -7);
+				cam_lerp_rotation = new Vector();
 				//1
 				cube1.enabled = 0;
 				cylinder1.enabled = 0;
@@ -64,6 +90,11 @@ function onMouseDown(mouse) {
 				stage3.enabled = 0;
 				//4
 				deer4.enabled = 0;
+				//5
+				for (let j = 0; j < balls5.length; j++)
+					balls5[j].enabled = 0;
+				plane5.enabled = 0;
+				ball5.enabled = 0;
 				if (i == 1) {
 					cube1.enabled = 1;
 					cylinder1.enabled = 1;
@@ -81,6 +112,14 @@ function onMouseDown(mouse) {
 				else if (i == 4){
 					deer4.enabled = 1;
 				}
+				else if (i == 5) {
+					cam_lerp_position = new Vector(0, 5, -8);
+					cam_lerp_rotation = new Vector(-30, 0, 0);
+					for (let j = 0; j < balls5.length; j++)
+						balls5[j].enabled = 1;
+					plane5.enabled = 1;
+					ball5.enabled = 1;
+				}
 			}
 		}
 	}
@@ -89,7 +128,7 @@ function onMouseDown(mouse) {
 }
 function onMouseMove(mouse) {
 	if (mouse_down && mouse_last)
-		lerp_rotation.add(new Vector((-(mouse.y - mouse_last.y)) / canvas.height * 360, (mouse.x - mouse_last.x) / canvas.width * 360));
+		obj_lerp_rotation.add(new Vector((-(mouse.y - mouse_last.y)) / canvas.height * 360, (mouse.x - mouse_last.x) / canvas.width * 360));
 	mouse_last = new Vector(mouse.x, mouse.y);
 }
 function onMouseUp(mouse) {
@@ -97,27 +136,40 @@ function onMouseUp(mouse) {
 	mouse_down = 0;
 }
 function onMouseWheel(wheel) {
-	lerp_position -= wheel.y / Math.abs(wheel.y);
+	cam_lerp_position.add(camera.position.normalized.multiply(wheel.y / Math.abs(wheel.y)));
 }
 
 function update() {
-	cat3.rotation = Vector.lerp(cat3.rotation, lerp_rotation, speed);
-	stage3.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
-	cube2_1.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
-	cube2_2.rotation = Vector.lerp(stage3.rotation, lerp_rotation.copy.multiply(5), speed);
-	pyramid1.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
-	sphere1.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
-	cube1.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
-	cylinder1.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
-	deer4.rotation = Vector.lerp(stage3.rotation, lerp_rotation, speed);
+	cat3.rotation = Vector.lerp(cat3.rotation, obj_lerp_rotation, speed);
+	stage3.rotation = Vector.lerp(stage3.rotation, obj_lerp_rotation, speed);
+	cube2_1.rotation = Vector.lerp(cube2_1.rotation, obj_lerp_rotation, speed);
+	cube2_2.rotation = Vector.lerp(cube2_2.rotation, obj_lerp_rotation.copy.multiply(1.7), speed);
+	pyramid1.rotation = Vector.lerp(pyramid1.rotation, obj_lerp_rotation, speed);
+	sphere1.rotation = Vector.lerp(sphere1.rotation, obj_lerp_rotation, speed);
+	cube1.rotation = Vector.lerp(cube1.rotation, obj_lerp_rotation, speed);
+	cylinder1.rotation = Vector.lerp(cylinder1.rotation, obj_lerp_rotation, speed);
+	deer4.rotation = Vector.lerp(deer4.rotation, obj_lerp_rotation, speed);
+	for (let i = 0; i < balls5.length; i++) {
+		balls5[i].center.y = Math.sin((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i) * 0.15;
+		balls5[i].rotation.y = lerp(balls5[i].rotation.y, obj_lerp_rotation.y, speed);
+		balls5[i].color = new Vector(Math.sin((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i),
+						 			 Math.cos((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i), 
+						 			 1);
+	}
+	ball5_speed -= 0.0098;
+	ball5.position.y += ball5_speed;
+	if (ball5.position.y < ball5.scale.y + plane5.position.y && ball5_speed < 0) {
+		ball5_speed *= -1;
+		ball5_speed += 0.0098;
+	}
+	ball5.rotation.y += 5;
 
-	camera.look(Vector.substract(new Vector(), camera.position));
-	camera.position.z = lerp(camera.position.z, lerp_position, speed);
-
+	camera.position = Vector.lerp(camera.position, cam_lerp_position, speed);
+	camera.rotation = Vector.lerp(camera.rotation, cam_lerp_rotation, speed);
 	render(camera);
 
 	context.fillText("Сцены: ", 10, canvas.height - 10);
 	context.fillStyle = "#0000FF";
-	for (let i = 1; i <= 4; i++) 
+	for (let i = 1; i <= 5; i++) 
 		context.fillText(i, 50 + i * 20, canvas.height - 10);
 }

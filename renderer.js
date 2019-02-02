@@ -9,7 +9,7 @@ function render(camera) {
 	if (properties.quality_auto) {
 		if (fps < 10 && properties.quality < 4)
 			properties.quality++;
-		if (fps > 30 && properties.quality > 1)
+		if (fps > 24 && properties.quality > 1)
 			properties.quality--;
 	}
 
@@ -20,13 +20,17 @@ function render(camera) {
 	context.fillText("50%", canvas.width - 150, 30);
 	context.fillText("33%", canvas.width - 100, 30);
 	context.fillText("25%", canvas.width - 50, 30);
-	context.fillStyle = "#000000";
 	if (properties.quality_auto) {
 		context.fillRect(canvas.width - 250, 35, 40, 1);
 		context.fillRect(canvas.width - 50 * (5 - properties.quality) + 5, 35, 20, 1);
 	}
 	else 
 		context.fillRect(canvas.width - 50 * (5 - properties.quality), 35, 40, 1);
+
+	context.fillText("Закрашивать", canvas.width - 250, 55)
+	if (!properties.wireframe)
+		context.fillRect(canvas.width - 250, 60, 100, 1)
+	context.fillStyle = "#000000";
 
 	render_time = (new Date).getTime();
 
@@ -102,6 +106,8 @@ function render(camera) {
 				for (let X = 0; X < properties.quality; X++) {
 					for (let Y = 0; Y < properties.quality; Y++) {
 						let index = (x + X + (y + Y) * canvas.width) * 4;
+						if (x + X < 0 || x + X >= canvas.width || y + Y < 0 || y + Y >= canvas.height)
+							continue;
 						canvas_data.data[index + 0] = r;
 					    canvas_data.data[index + 1] = g;
 					    canvas_data.data[index + 2] = b;
@@ -182,13 +188,26 @@ function render(camera) {
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
 				}
 				if (inView) {
-					let color = Math.floor(lerp(240, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
-					triangle(points[0], points[1], points[2], 
-							 vertices[0], vertices[1], vertices[2], 
-							 Math.floor(color * objects[object].color.x), Math.floor(color * objects[object].color.y), Math.floor(color * objects[object].color.z));
+					if (!properties.wireframe) {
+						let color = Math.floor(lerp(240, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
+						triangle(points[0], points[1], points[2], 
+								 vertices[0], vertices[1], vertices[2], 
+								 Math.floor(color * objects[object].color.x), Math.floor(color * objects[object].color.y), Math.floor(color * objects[object].color.z));
+					}
+					else {
+						context.strokeStyle = "#000000";
+						context.beginPath();
+						context.moveTo(points[0].x, points[0].y);
+						context.lineTo(points[1].x, points[1].y);
+						context.lineTo(points[2].x, points[2].y);
+						context.lineTo(points[0].x, points[0].y);
+						context.stroke(); 
+						context.closePath();
+					}
 				}
 			}
 		}
 	}
-	context.putImageData(canvas_data, 0, 0);
+	if (!properties.wireframe)
+		context.putImageData(canvas_data, 0, 0);
 }

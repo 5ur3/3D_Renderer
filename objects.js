@@ -265,6 +265,7 @@ class Properties {
 		this.framerate = 60;
 		this.quality_auto = 1;
 		this.quality = 1;
+		this.wireframe = 0;
 	}
 }
 
