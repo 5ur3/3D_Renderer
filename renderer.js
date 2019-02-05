@@ -96,16 +96,35 @@ function render(camera) {
 		if (!dot11_22_m_dot12_12) 
 			return;
 
+		let v = Vector.substract(new Vector(min.x, min.y), vertex1);
+		let dot01 = v.dot(v1);
+		let dot02 = v.dot(v2);
+		let U_start = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12;
+		let V_start = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12;
+		
+		v.add(new Vector(1));
+		dot01 = v.dot(v1);
+		dot02 = v.dot(v2);
+		let U_x = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12 - U_start;
+		let V_x = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12 - V_start;
+		
+		v.add(new Vector(-1, 1));
+		dot01 = v.dot(v1);
+		dot02 = v.dot(v2);
+		let U_y = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12 - U_start;
+		let V_y = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12 - V_start;
+		let v12_3 = Vector.substract(v2_3, v1_3);
+		let v13_3 = Vector.substract(v3_3, v1_3);
 		function point(x, y) {
-			let v = Vector.substract(new Vector(x, y), vertex1);
-			let dot01 = v.dot(v1);
-			let dot02 = v.dot(v2);
-			let U = (dot22 * dot01 - dot12 * dot02) / dot11_22_m_dot12_12;
-			let V = (dot11 * dot02 - dot12 * dot01) / dot11_22_m_dot12_12;
-			if (U < 0 || V < 0 || U + V > 1)
+			let dx = x - min.x;
+			let dy = y - min.y;
+			let U = U_start + dx * U_x + dy * U_y;
+			let V = V_start + dx * V_x + dy * V_y;
+			let epsilon = 1e-13;
+			if (U < 0 - epsilon || V < 0 - epsilon || U + V > 1 + epsilon)
 				return;
 
-			let point_depth = Vector.distance_squared(camera.position, Vector.add(Vector.substract(v2_3, v1_3).multiply(U), Vector.substract(v3_3, v1_3).multiply(V)).add(v1_3));
+			let point_depth = Vector.distance_squared(camera.position, Vector.add(v12_3.copy.multiply(U), v13_3.copy.multiply(V)).add(v1_3));
 			// закрашивать пиксель только если он первый или выше предыдущего
 			if (!depth[x + y * canvas.width] || point_depth < depth[x + y * canvas.width]) {
 				for (let X = 0; X < properties.quality; X++) {
