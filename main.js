@@ -1,7 +1,6 @@
 let camera = new Camera();
 camera.position.z = -7;
 
-// сцена 1
 let cube1 = new Object3D();
 cube1.mesh = Mesh.cube;
 cube1.position.x = -3;
