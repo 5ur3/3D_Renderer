@@ -117,6 +117,11 @@ class Mesh {
 	}
 
 	static load_object(path) {
+		if (typeof Mesh.load_object.cached == 'undefined') 
+			Mesh.load_object.cached = {}; 
+		if (Mesh.load_object.cached.hasOwnProperty(path)) 
+			return Mesh.load_object.cached[path]; 
+
 		let file = load_file(path);
 		let data = file.split("\n");
 
@@ -204,6 +209,7 @@ class Mesh {
 				mesh[i][j].multiply(scale);
 			}
 		}
+		Mesh.load_object.cached[path] = new Mesh(mesh, normals);
 		return new Mesh(mesh, normals);
 	}
 
