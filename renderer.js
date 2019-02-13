@@ -136,12 +136,6 @@ function render(camera) {
 			let points = [];
 			// инициализация переменной, отвечающей за то, должен ли полигон рисоваться на экране
 			let vertices = [];
-			// получение нормали к плоскости
-			let normal = objects[object].mesh.normals[poly].copy;
-			normal = rotate(normal, x, objects[object].rotation.x);
-			normal = rotate(normal, y, objects[object].rotation.y);
-			normal = rotate(normal, z, objects[object].rotation.z);
-			
 			draw_poly: {
 				for (let i = 0; i < 3; i++) {
 					// скалирование, вращение и трансляция позиций вершин в глобальные координаты
@@ -156,8 +150,7 @@ function render(camera) {
 											polygons[poly][i].y + objects[object].position.y, 
 											polygons[poly][i].z + objects[object].position.z); // позиция вершины в пространстве
 					vertices.push(vertex);
-					if (Vector.angle(normal, Vector.substract(vertex, camera.position)) < Math.PI / 2)
-						break draw_poly;
+					
 					let vertex2cam = new Vector(vertex.x - camera.position.x, vertex.y - camera.position.y, vertex.z - camera.position.z); // позиция вершины в пространстве камеры
 					let angle = Vector.angle(vertex2cam, forward); // угол между нормалью камеры и вектором от камеры до позициии вершины
 					let cam2plane = new Vector(forward.x * Math.cos(angle) * vertex2cam.length, 
@@ -175,13 +168,20 @@ function render(camera) {
 					x = plane_vector.x * (angle / ((camera.field_of_view * Math.PI / 180) / 2)) * (screenSize / 2);
 					y = plane_vector.y * (angle / ((camera.field_of_view * Math.PI / 180) / 2)) * (screenSize / 2);
 					points.push(new Vector(x + canvas.width / 2, y + canvas.height / 2));
-				}
+				} 
+				// получение нормали к плоскости
+				let normal = Vector.cross(Vector.substract(vertices[0], vertices[1]).normalized, 
+								  		  Vector.substract(vertices[1], vertices[2]).normalized);
+				for (let i = 0; i < 3; i++) 
+					if (Vector.angle(normal, Vector.substract(vertices[i], camera.position)) < Math.PI / 2)
+							break draw_poly;
+
 				if (!properties.wireframe) {
 					// Цвет полигона определяется углом между нормалью полигона и отрицательной нормалью камеры. Чем он меньше, тем цвет ярче. (Полигон ярче когда он повернут в камеру)
 					let color = Math.floor(lerp(240, 50, Vector.angle(Vector.substract(new Vector(), forward), normal) / (Math.PI / 2))); 
 					triangle(points[0], points[1], points[2], 
 							 vertices[0], vertices[1], vertices[2], 
-							 Math.floor(color * objects[object].color.x), Math.floor(color * objects[object].color.y), Math.floor(color * objects[object].color.z));
+							 Math.floor(color * objects[object].material.color.x), Math.floor(color * objects[object].material.color.y), Math.floor(color * objects[object].material.color.z));
 				}
 				else {
 					// соединение точек полигона линиями при wireframe рендере

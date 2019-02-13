@@ -105,15 +105,11 @@ class Vector {
 }
 
 class Mesh {
-	constructor(polygons, normals) {
-		if (polygons && normals) {
+	constructor(polygons) {
+		if (polygons)
 			this.polygons = polygons;
-			this.normals = normals;
-		}
-		else {
+		else 
 			this.polygons = [];
-			this.normals = [];
-		}
 	}
 
 	static load_object(path) {
@@ -126,9 +122,7 @@ class Mesh {
 		let data = file.split("\n");
 
 		let vertices = [];
-
 		let mesh = [];
-		let normals = [];
 
 		let max = new Vector();
 		let min = new Vector();
@@ -149,8 +143,6 @@ class Mesh {
 					mesh.push([vertices[Number(line[1].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[2].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[3].split('/')[0]) - 1].copy]);
-					normals.push(Vector.cross(Vector.substract(vertices[Number(line[1].split('/')[0]) - 1], vertices[Number(line[2].split('/')[0]) - 1]).normalized, 
-											  Vector.substract(vertices[Number(line[2].split('/')[0]) - 1], vertices[Number(line[3].split('/')[0]) - 1]).normalized));
 					for (let i = 1; i < 4; i++) {
 						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
 							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
@@ -174,10 +166,6 @@ class Mesh {
 					mesh.push([vertices[Number(line[3].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[4].split('/')[0]) - 1].copy, 
 							   vertices[Number(line[1].split('/')[0]) - 1].copy]);
-					normals.push(Vector.cross(Vector.substract(vertices[Number(line[1].split('/')[0]) - 1], vertices[Number(line[2].split('/')[0]) - 1]).normalized, 
-											  Vector.substract(vertices[Number(line[2].split('/')[0]) - 1], vertices[Number(line[3].split('/')[0]) - 1]).normalized));
-					normals.push(Vector.cross(Vector.substract(vertices[Number(line[3].split('/')[0]) - 1], vertices[Number(line[4].split('/')[0]) - 1]).normalized, 
-											  Vector.substract(vertices[Number(line[4].split('/')[0]) - 1], vertices[Number(line[1].split('/')[0]) - 1]).normalized));
 					for (let i = 1; i < 5; i++) {
 						if (vertices[Number(line[i].split('/')[0]) - 1].x > max.x)
 							max.x = vertices[Number(line[i].split('/')[0]) - 1].x;
@@ -209,8 +197,8 @@ class Mesh {
 				mesh[i][j].multiply(scale);
 			}
 		}
-		Mesh.load_object.cached[path] = new Mesh(mesh, normals);
-		return new Mesh(mesh, normals);
+		Mesh.load_object.cached[path] = new Mesh(mesh);
+		return new Mesh(mesh);
 	}
 
 	static get empty() {
@@ -240,14 +228,20 @@ class Mesh {
 	}
 }
 
+class Material {
+	constructor() {
+		this.color = new Vector(1, 1, 1);
+	}
+}
+
 class Object3D {
 	constructor() {
 		this.position = new Vector();
 		this.rotation = new Vector();
 		this.scale = new Vector(1, 1, 1);
 		this.center = new Vector();
-		this.mesh = Mesh.cube;	
-		this.color = new Vector(1, 1, 1);
+		this.material = new Material();
+		this.mesh = Mesh.cube;
 		this.enabled = 1;
 		objects.push(this);
 	}

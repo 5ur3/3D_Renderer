@@ -4,26 +4,27 @@ camera.position.z = -7;
 let cube1 = new Object3D();
 cube1.mesh = Mesh.cube;
 cube1.position.x = -3;
-cube1.color = new Vector(1, 0, 0);
+cube1.material.color = new Vector(1, 0, 0);
 let pyramid1 = new Object3D();
 pyramid1.mesh = Mesh.pyramid;
 pyramid1.position.x = -1;
-pyramid1.color = new Vector(0, 1, 0);
+pyramid1.material.color = new Vector(0, 1, 0);
 let sphere1 = new Object3D();
 sphere1.mesh = Mesh.sphere;
 sphere1.position.x = 1;
-sphere1.color = new Vector(0, 0, 1);
+sphere1.material.color = new Vector(0, 0, 1);
+sphere1.scale.y = 0.01;
 let cylinder1 = new Object3D();
 cylinder1.mesh = Mesh.cylinder;
 cylinder1.position.x = 3;
-cylinder1.color = new Vector(1, 1, 0);
+cylinder1.material.color = new Vector(1, 1, 0);
 // сцена 2
 let cube2_1 = new Object3D();
 cube2_1.enabled = 0;
-cube2_1.color = new Vector(0.3, 0.3, 1);
+cube2_1.material.color = new Vector(0.3, 0.3, 1);
 let cube2_2 = new Object3D();
 cube2_2.enabled = 0;
-cube2_2.color = new Vector(1, 0.3, 0.3);
+cube2_2.material.color = new Vector(1, 0.3, 0.3);
 // сцена 3
 let cat3 = new Object3D();
 cat3.enabled = 0;
@@ -53,13 +54,13 @@ let plane5 = new Object3D();
 plane5.position.y = -1;
 plane5.scale.y = 0.01;
 plane5.enabled = 0;
-plane5.color = new Vector(0.2, 0.2, 0.2);
+plane5.material.color = new Vector(0.2, 0.2, 0.2);
 let ball5 = new Object3D();
 ball5.scale.multiply(0.5);
 ball5.position.y = 2;
 ball5.mesh = Mesh.sphere;
 ball5.enabled = 0;
-ball5.color = new Vector(0.8, 0.8, 0.2);
+ball5.material.color = new Vector(0.8, 0.8, 0.2);
 let ball5_speed = 0;
 
 let speed = 0.1;
@@ -151,7 +152,7 @@ function update() {
 	for (let i = 0; i < balls5.length; i++) {
 		balls5[i].center.y = Math.sin((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i) * 0.15;
 		balls5[i].rotation.y = lerp(balls5[i].rotation.y, obj_lerp_rotation.y, speed);
-		balls5[i].color = new Vector(Math.sin((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i),
+		balls5[i].material.color = new Vector(Math.sin((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i),
 						 			 Math.cos((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i), 
 						 			 1);
 	}
