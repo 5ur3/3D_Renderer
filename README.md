@@ -45,7 +45,6 @@
 	Mesh {
 		Атрибуты объекта {
 			polygons: Array // массив полигонов. Каждый полигон является массивом векторов длиной 3
-			normals: Array // нормали для каждого полигона
 		}
 		Статичные поля {
 			Mesh.empty: Mesh // Пустой mesh
@@ -61,6 +60,11 @@
 			Mesh.load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
 		}
 	}
+	Material {
+		Атрибуты объекта {
+			color: Vector (1, 1, 1) [0; 1] // Множители каналов цвета R G и B на отрисовке
+		}
+	}
 	Object3D {
 		Атрибуты объекта {
 			position: Vector (0, 0, 0)
@@ -68,8 +72,8 @@
 			scale: Vector (1, 1, 1) // Множитель размера
 			mesh: Array (Mesh.cube) // Полигональная фигура
 			center: Vector (0, 0, 0) // Точка опоры объекта
+			material: Material
 			enabled: Boolean (true)
-			color: Vector (1, 1, 1) [0; 1] // Множители каналов цвета R G и B на отрисовке
 		}
 	}
 	Camera {
