@@ -60,7 +60,8 @@
 			Mesh.load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
 		}
 	}
-	Material {
+	[Shader]
+	Color { // Простой шейдер, выполняющий закраску полигонов цветом объекта
 		Атрибуты объекта {
 			color: Vector (1, 1, 1) [0; 1] // Множители каналов цвета R G и B на отрисовке
 		}
@@ -72,8 +73,14 @@
 			scale: Vector (1, 1, 1) // Множитель размера
 			mesh: Array (Mesh.cube) // Полигональная фигура
 			center: Vector (0, 0, 0) // Точка опоры объекта
-			material: Material
+			shader: <Class> (Color)
 			enabled: Boolean (true)
+		}
+	}
+	Directional_Light { // Направленный свет. Не имеет позиции в пространстве, так как освещает каждый объект одинаково, несмотря на его расположение и размеры.
+		Атрибуты объекта {
+			direction: Vector (1, -1, 1) 
+			intensity: Number (1);
 		}
 	}
 	Camera {

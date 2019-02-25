@@ -1,6 +1,7 @@
 // Данный скрипт содержит список функций, которые я не смог включить в какой-либо из объектов
 
 var objects = [];
+var directional_lights = [];
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
