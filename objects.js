@@ -10,7 +10,7 @@ class Mesh {
 		if (typeof Mesh.load_object.cached == 'undefined') 
 			Mesh.load_object.cached = {}; 
 		if (Mesh.load_object.cached.hasOwnProperty(path)) 
-			return Mesh.load_object.cached[path]; 
+			return {mesh: Mesh.load_object.cached[path], name: path}; 
 
 		let file = load_file(path);
 		let data = file.split("\n");
@@ -92,11 +92,11 @@ class Mesh {
 			}
 		}
 		Mesh.load_object.cached[path] = new Mesh(mesh);
-		return new Mesh(mesh);
+		return {mesh: new Mesh(mesh), name: path};
 	}
 
 	static get empty() {
-		return new Mesh();
+		return {mesh: new Mesh(), name: "empty"};
 	}
 	static get cube() {
 		return Mesh.load_object("obj/cube.obj");
@@ -129,9 +129,17 @@ class Object3D {
 		this.scale = new Vector(1, 1, 1);
 		this.center = new Vector();
 		this.shader = new Color();
-		this.mesh = Mesh.cube;
+		this._mesh = Mesh.cube.mesh;
+		this.mesh_name = "obj/cube.obj";
 		this.enabled = 1;
 		objects.push(this);
+	}
+	set mesh(mesh) {
+		this._mesh = mesh.mesh;
+		this.mesh_name = mesh.name;
+	}
+	get mesh() {
+		return this._mesh;
 	}
 }
 

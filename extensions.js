@@ -4,7 +4,7 @@ var objects = [];
 var directional_lights = [];
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+ 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 Array.prototype.clone = function() {

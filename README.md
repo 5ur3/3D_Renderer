@@ -47,21 +47,21 @@
 			polygons: Array // массив полигонов. Каждый полигон является массивом векторов длиной 3
 		}
 		Статичные поля {
-			Mesh.empty: Mesh // Пустой mesh
-			Mesh.cube: Mesh // Куб
-			Mesh.sphere: Mesh // Сфера
-			Mesh.cylinder: Mesh // Цилиндр
-			Mesh.pyramid: Mesh // Пирамида
-			Mesh.cat: Mesh // Модель кота
-			Mesh.cat_lpoly: Mesh // Низкополигональная модель кота
-			Mesh.deer: Mesh // Олень
+			Mesh.empty: {mesh: Mesh, name: path} // Пустой mesh
+			Mesh.cube: {mesh: Mesh, name: path} // Куб
+			Mesh.sphere: {mesh: Mesh, name: path} // Сфера
+			Mesh.cylinder: {mesh: Mesh, name: path} // Цилиндр
+			Mesh.pyramid: {mesh: Mesh, name: path} // Пирамида
+			Mesh.cat: {mesh: Mesh, name: path} // Модель кота
+			Mesh.cat_lpoly: {mesh: Mesh, name: path} // Низкополигональная модель кота
+			Mesh.deer: {mesh: Mesh, name: path} // Олень
 		}
 		Статичные функции {
-			Mesh.load_object(path: Str) : Mesh // Возвращает модель, взятую из файла .obj
+			Mesh.load_object(path: Str) : {mesh: Mesh, name: path} // Возвращает модель, взятую из файла .obj
 		}
 	}
 	[Shader]
-	Color { // Простой шейдер, выполняющий закраску полигонов цветом объекта
+	Color { // Простой шейдер, выполняющий закраску полигонов одним цветом с учетом света
 		Атрибуты объекта {
 			color: Vector (1, 1, 1) [0; 1] // Множители каналов цвета R G и B на отрисовке
 		}
@@ -77,10 +77,10 @@
 			enabled: Boolean (true)
 		}
 	}
-	Directional_Light { // Направленный свет. Не имеет позиции в пространстве, так как освещает каждый объект одинаково, несмотря на его расположение и размеры.
+	Directional_Light { // Направленный свет. Не имеет позиции в пространстве
 		Атрибуты объекта {
 			direction: Vector (1, -1, 1) 
-			intensity: Number (1);
+			intensity: Number (1)
 		}
 	}
 	Camera {
@@ -113,7 +113,7 @@
 }
 
 Пользовательские функции (Должны быть объявлены в main.js) {
-	function update() {//...} // Вызывается properties.framerate раз в секунду
+	function update() // Вызывается не более properties.framerate раз в секунду
 	function onMouseDown(mouse: Vector) // Вызывается при нажатии на левую кнопку мыши и передает вектор, содержащий позицию мыши в координатах canvas
 	function onMouseMove(mouse: Vector) // Вызывается при движении мыши и передает вектор, содержащий позицию мыши в координатах canvas
 	function onMouseUp(mouse: Vector) // Вызывается при отжатии левой кнопки мыши и передает вектор, содержащий позицию мыши в координатах canvas

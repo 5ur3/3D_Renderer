@@ -39,6 +39,11 @@ stage3.center.y = 0.53;
 let deer4 = new Object3D();
 deer4.enabled = 0;
 deer4.mesh = Mesh.deer;
+deer4.rotation.y = 150;
+deer4.rotation.x = -5;
+deer4.position.z = -4;
+let light4 = new Directional_Light();
+light4.intensity = 0;
 //сцена 5
 let balls5 = new Array(20);
 let radius5 = 2;
@@ -90,6 +95,8 @@ function onMouseDown(mouse) {
 				stage3.enabled = 0;
 				//4
 				deer4.enabled = 0;
+				light4.intensity = 0;
+				light.intensity = 1;
 				//5
 				for (let j = 0; j < balls5.length; j++)
 					balls5[j].enabled = 0;
@@ -111,6 +118,8 @@ function onMouseDown(mouse) {
 				}
 				else if (i == 4){
 					deer4.enabled = 1;
+					light4.intensity = 1;
+					light.intensity = 0;
 				}
 				else if (i == 5) {
 					cam_lerp_position = new Vector(0, 5, -8);
@@ -148,7 +157,7 @@ function update() {
 	sphere1.rotation = Vector.lerp(sphere1.rotation, obj_lerp_rotation, speed);
 	cube1.rotation = Vector.lerp(cube1.rotation, obj_lerp_rotation, speed);
 	cylinder1.rotation = Vector.lerp(cylinder1.rotation, obj_lerp_rotation, speed);
-	deer4.rotation = Vector.lerp(deer4.rotation, obj_lerp_rotation, speed);
+	light4.direction = new Vector(Math.sin(cylinder1.rotation.x / 50), Math.cos(cylinder1.rotation.y / 50), Math.sin(cylinder1.rotation.z / 50));
 	for (let i = 0; i < balls5.length; i++) {
 		balls5[i].center.y = Math.sin((new Date).getTime() / 1000 + Math.PI * 6 / balls5.length * i) * 0.15;
 		balls5[i].rotation.y = lerp(balls5[i].rotation.y, obj_lerp_rotation.y, speed);
